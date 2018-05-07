@@ -9,7 +9,7 @@ image, and builds the application source on top of that base image, and pushes
 the resulting application image to a Docker registry under the provided name.
 
 To use a custom buildpack, multi-stage buildpacks, or override buildpack
-detection, use the buildpack-skipdetect build template.
+detection, use the [buildpack-skipdetect build template](../buildpack-skipdetect/).
 
 ## Parameters
 

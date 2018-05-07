@@ -6,8 +6,8 @@ spec:
   parameters:
   - name: IMAGE
     description: The name of the image to push
-  - name: BUILDPACK
-    description: The name or URL for the buildpack to use (comma separated list)
+  - name: BUILDPACKS
+    description: A comma separated list of names or URLs for the buildpacks to use. Each item is applied as a buildpack stage in order.
   - name: DIRECTORY
     description: The directory containing the app
     default: /workspace
@@ -21,7 +21,7 @@ spec:
   # Out: a build cache in /cache
   - name: build
     image: packs/cf:build
-    args: ["-skipDetect", "-buildpackOrder", "${BUILDPACK}"]
+    args: ["-skipDetect", "-buildpackOrder", "${BUILDPACKS}"]
     workingdir: "${DIRECTORY}"
     volumeMounts:
     - name: droplet
