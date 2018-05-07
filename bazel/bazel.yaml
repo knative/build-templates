@@ -1,0 +1,13 @@
+apiVersion: build.dev/v1alpha1
+kind: BuildTemplate
+metadata:
+  name: bazel
+spec:
+  parameters:
+  - name: TARGET
+    description: The name of the Bazel "container_push" target to run
+
+  steps:
+  - name: build-and-push
+    image: gcr.io/cloud-builders/bazel
+    args: ['run', '${TARGET}']
