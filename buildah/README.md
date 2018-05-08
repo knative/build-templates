@@ -48,7 +48,7 @@ to change in the future. You can build the image from [the Dockerfile in this
 directory](./Dockerfile), e.g.:
 
 ```
-docker build -t buildah . && docker push buildah`
+docker build -t buildah . && docker push buildah
 ```
 
 (You could also build the image using `buildah` itself, or `kaniko`)
