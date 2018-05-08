@@ -17,7 +17,6 @@ to assemble a container image, then pushes that image to a container registry.
   (_required_)
 * **DOCKERFILE**: The path to the `Dockerfile` to execute (_default:_
   `./Dockerfile`)
-```
 
 ## Usage
 
