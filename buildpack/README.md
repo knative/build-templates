@@ -8,13 +8,15 @@ system detects the source language and runtime, identifies a suitable base
 image, and builds the application source on top of that base image, and pushes
 the resulting application image to a Docker registry under the provided name.
 
-To use a custom buildpack, multi-stage buildpacks, or override buildpack
-detection, use the [buildpack-skipdetect build template](../buildpack-skipdetect/).
-
 ## Parameters
 
 * **IMAGE:** The Docker image name to apply to the newly built image.
     (_required_)
+* **BUILDPACK_ORDER:** A comma separated list of names or URLs for the
+    buildpacks to use. Each buildpack is applied in order. (_default:_ `""`)
+* **SKIP_DETECT:** By default, the first buildpack to match is used. If true,
+    detection is skipped and each buildpack contributes in order.
+    (_default:_ `"false"`)
 * **DIRECTORY:** The directory in the source repository where source
     should be found. (_default:_ `/workspace`)
 * **CACHE:** The directory where data should be persistently cached
