@@ -1,0 +1,9 @@
+apiVersion: build.dev/v1alpha1
+kind: BuildTemplate
+metadata:
+  name: jib-maven
+spec:
+  steps:
+  - name: build-and-push
+    image: gcr.io/cloud-builders/mvn
+    args: ['compile', 'jib:build']
