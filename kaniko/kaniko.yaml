@@ -1,7 +1,7 @@
 apiVersion: build.dev/v1alpha1
 kind: BuildTemplate
 metadata:
-  name: kankiko
+  name: kaniko
 spec:
   parameters:
   - name: IMAGE
