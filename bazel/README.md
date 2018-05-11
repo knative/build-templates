@@ -40,14 +40,13 @@ kind: Build
 metadata:
   name: bazel-build
 spec:
-  build:
-    source:
-      git:
-        url: https://github.com/my-user/my-repo
-        branch: master
-    template:
-      name: bazel
-      arguments:
-      - name: TARGET
-        value: //path/to/build:target
+  source:
+    git:
+      url: https://github.com/my-user/my-repo
+      branch: master
+  template:
+    name: bazel
+    arguments:
+    - name: TARGET
+      value: //path/to/build:target
 ```

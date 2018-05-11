@@ -40,13 +40,12 @@ kind: Build
 metadata:
   name: jib-maven-build
 spec:
-  build:
-    source:
-      git:
-        url: https://github.com/my-user/my-repo
-        branch: master
-    template:
-      name: jib-maven
+  source:
+    git:
+      url: https://github.com/my-user/my-repo
+      branch: master
+  template:
+    name: jib-maven
 ```
 
 ## Usage (Gradle)
@@ -69,11 +68,10 @@ kind: Build
 metadata:
   name: jib-gradle-build
 spec:
-  build:
-    source:
-      git:
-        url: https://github.com/my-user/my-repo
-        branch: master
-    template:
-      name: jib-gradle
+  source:
+    git:
+      url: https://github.com/my-user/my-repo
+      branch: master
+  template:
+    name: jib-gradle
 ```
