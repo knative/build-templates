@@ -29,16 +29,15 @@ kind: Build
 metadata:
   name: buildpack-build
 spec:
-  build:
-    source:
-      git:
-        url: https://github.com/my-user/my-repo
-        branch: master
-    template:
-      name: buildpack
-      arguments:
-      - name: IMAGE
-        value: us.gcr.io/my-project/my-app
+  source:
+    git:
+      url: https://github.com/my-user/my-repo
+      branch: master
+   template:
+   name: buildpack
+   arguments:
+   - name: IMAGE
+     value: us.gcr.io/my-project/my-app
 ```
 
 Next, create the build you defined:
