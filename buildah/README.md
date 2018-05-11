@@ -35,8 +35,10 @@ spec:
     template:
       name: buildah
       arguments:
+      - name: BUILDER_IMAGE
+        value: gcr.io/my-project/buildah
       - name: IMAGE
-        value: us.gcr.io/my-project/my-app
+        value: gcr.io/my-project/my-app
 ```
 
 In this example, the Git repo being built is expected to have a `Dockerfile` at
