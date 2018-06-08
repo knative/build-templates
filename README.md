@@ -1,7 +1,10 @@
-# Elafros Build Templates
+# Knative Build Templates
 
-This repository contains a library of `BuildTemplate` resources which are
-designed to be reusable by many applications.
+This repository contains a library of
+[`BuildTemplate` resources](https://github.com/knative/build) which
+are designed to be reusable by many applications. Each buildpack is in
+a separate directory along with a README.md, so you can choose which
+buildpacks to install on your cluster.
 
 ## Using Build Templates
 
