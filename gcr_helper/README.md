@@ -32,3 +32,16 @@ created key [462561f97c7fc567f167b4cef8e9bfedde992143] of type [json] as [image-
 serviceaccount "builder" configured
 secret "gcr-creds" created
 ```
+
+To use, simply add a `serviceAccountName: builder` entry to your build definition
+
+```yaml:
+apiVersion: build.dev/v1alpha1
+kind: Build
+metadata:
+  name: mybuild
+spec:
+  serviceAccountName: builder
+  source: ...
+  template: ...
+```
