@@ -10,7 +10,14 @@ secret in your current kubernetes cluster and namespace.
 ```shell
 # Usage assumes that the user has IAM Owner permissions for the project.
 gcloud config set core/project $PROJECT_ID
-gcr_helper.sh
+gcr_helper/helper.sh
+```
+
+Optionally, `helper.sh` accepts two positional arguments to specify
+the namespace and kubernetes service account used:
+
+```shell
+gcr_helper/helper.sh $MY_NAMESPACE builder-serviceaccount
 ```
 
 This will output a log of operations performed or skipped:

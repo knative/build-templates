@@ -1,11 +1,70 @@
 #!/bin/bash
 #
-# A simple script to create or 
+# A simple script to create or validate credentials to allow pushing
+# built images to gcr.io.
+#
+# This script assumes the following environment:
+#
+# 1. `gcloud`, `gsutil`, 'kubectl` and `jq` installed and in $PATH.
+#
+# 2. gcloud configured with a default project, or the $PROJECT_ID
+#    environment variable set.
+#
+# 3. The current `gcloud` credentials have permissions to create
+#    service accounts and change IAM ACLs.
+#
+# 4. kubectl context configured, or appropriate flags passed on the
+#    command line to select namespace and (optionally) builder service
+#    account name.
+#
+# The script should warn if any of these preconditions cannot be met.
+#
+# Once all arguments are validated, this script will:
+#
+# 1. Provision a GCP Service Account and grant it access to all
+#    existing GCR buckets.
+#
+# 2. Create a kubernetes secret with the appropriate metadata for
+#    usage by build steps, accessible by a service account named
+#    "builder" (by default).
+
+##
+## Validate environment.
+##
+
+checkBinary() {
+    if ! which $1 >&/dev/null; then
+        echo "Unable to locate $1, please ensure it is installed and on your $PATH."
+        exit 1
+    fi
+}
+
+checkBinary gcloud
+checkBinary gsutil
+checkBinary jq
+checkBinary kubectl
+
+if [[ -z "${PROJECT_ID:=$(gcloud config get-value project)}" ]]; then
+    echo "Could not determine project id from $PROJECT_ID or gcloud defaults."
+    exit 1
+fi
+
+readonly KUBECTL_FLAGS="${1:+ -n $1}"
+
+if ! kubectl $KUBECTL_FLAGS get sa >& /dev/null; then
+    echo "Unable to read Kubernetes service accounts with 'kubectl $KUBECTL_FLAGS get sa'."
+    exit 1
+fi
+
+KUBE_SA=${2:-"builder"}
 
 
-PROJECT_ID=$(gcloud config get-value project)
-ACCOUNT_NAME=push-image
-SERVICE_ACCOUNT=$ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com
+##
+## Begin doing things
+##
+
+echo ${GCP_SA_NAME:=push-image} >& /dev/null
+readonly GCP_SA=$GCP_SA_NAME@$PROJECT_ID.iam.gserviceaccount.com
 
 # Supress stderr, as many of the check queries will print extra output
 # if the resources are not present. Keep stderr on FD 3 to allow
@@ -20,28 +79,26 @@ for SERVICE in iam containerregistry; do
 	echo "$SERVICE.googleapis.com already enabled"
     else
 	echo "Enabling $SERVICE.googleapis.com..."
-	gcloud services enable $SERVICE.googleapis.com 2>&3
+	gcloud services enable $SERVICE.googleapis.com 2>&3 || exit 2
     fi
 done
 
-SA=$(gcloud iam service-accounts describe $SERVICE_ACCOUNT)
-if [ $? -eq 0 ]; then
-    echo "Using existing service account $SERVICE_ACCOUNT"
+if gcloud iam service-accounts describe $GCP_SA >&/dev/null; then
+    echo "Using existing service account $GCP_SA"
 else
-    echo "Could not find $SERVICE_ACCOUNT, creating..."
-    gcloud iam service-accounts create $ACCOUNT_NAME 2>&3
-    SA=$(gcloud iam service-accounts describe $SERVICE_ACCOUNT)
+    echo "Could not find $GCP_SA, creating..."
+    gcloud iam service-accounts create $GCP_SA_NAME 2>&3 || exit 2
 fi
 
 ensureIamPermission() {
-    BUCKET=$1
+    local BUCKET=$1
     gsutil iam get $BUCKET | \
-	jq -e ".bindings | map(select(.role == \"roles/storage.admin\" )) | any(.members | any(. == \"serviceAccount:$SERVICE_ACCOUNT\"))" >/dev/null
+	jq -e ".bindings | map(select(.role == \"roles/storage.admin\" )) | any(.members | any(. == \"serviceAccount:$GCP_SA\"))" >/dev/null
     if [ $? -eq 0 ]; then
-	echo "$SERVICE_ACCOUNT already has access to $BUCKET"
+	echo "$GCP_SA already has access to $BUCKET"
     else
-	echo "Granting $SERVICE_ACCOUNT admin access to $BUCKET"
-	gsutil iam ch serviceAccount:$SERVICE_ACCOUNT:admin $BUCKET 2>&3
+	echo "Granting $GCP_SA admin access to $BUCKET"
+	gsutil iam ch serviceAccount:$GCP_SA:admin $BUCKET 2>&3 || exit 2
     fi
 }
 
@@ -52,10 +109,10 @@ for B in artifacts us.artifacts eu.artifacts asia.artifacts; do
 done
 
 
-## See if secrets are already loaded. If not, add them.
-if [[ $(kubectl get -o jsonpath='{.secrets[?(@.name=="gcr-creds")].name}' sa builder) == 'gcr-creds' ]]; then
-    echo "Found serviceAccount 'builder' with access to 'gcr-creds'"
-    if [[ $(kubectl get -o jsonpath={.type} secrets gcr-creds) == 'kubernetes.io/basic-auth' ]]; then
+# See if secrets are already loaded. If not, add them.
+if [[ $(kubectl $KUBECTL_FLAGS get -o jsonpath='{.secrets[?(@.name=="gcr-creds")].name}' sa $KUBE_SA) == 'gcr-creds' ]]; then
+    echo "Found serviceAccount '$KUBE_SA' with access to 'gcr-creds'"
+    if [[ $(kubectl $KUBECTL_FLAGS get -o jsonpath={.type} secrets gcr-creds) == 'kubernetes.io/basic-auth' ]]; then
 	echo "Secrets set up already, exiting"
 	exit 0
     fi
@@ -63,13 +120,13 @@ fi
     
 
 # Temporarily store a local JSON key for the service account.
-gcloud iam service-accounts keys create image-push-key.json --iam-account $SERVICE_ACCOUNT 2>&3
+gcloud iam service-accounts keys create image-push-key.json --iam-account $GCP_SA 2>&3 || exit 2
 
-cat <<EOF | kubectl apply -f - 2>&3
+cat <<EOF | kubectl $KUBECTL_FLAGS apply -f - 2>&3
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: builder
+  name: $KUBE_SA
 secrets:
 - name: gcr-creds
 ---
@@ -84,8 +141,12 @@ metadata:
     build.dev/docker-3: https://asia.gcr.io
 type: kubernetes.io/basic-auth
 data:
-  username: X2pzb25fa2V5  # _json_key, base64 encoded
+  username: $(echo -n "_json_key" | base64 -w 0) # Should be X2pzb25fa2V5
   password: $(base64 -w 0 image-push-key.json)
 EOF
 
+EXIT=$?
+
 rm image-push-key.json
+
+exit $?
