@@ -8,7 +8,7 @@ spec:
     description: The name of the image to push
   - name: DOCKERFILE
     description: Path to the Dockerfile to build.
-    default: ./Dockerfile
+    default: /workspace/Dockerfile
 
   steps:
   - name: build-and-push
