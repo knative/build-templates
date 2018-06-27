@@ -1,0 +1,10 @@
+apiVersion: build.dev/v1alpha1
+kind: Build
+metadata:
+  name: buildpack-build
+spec:
+  source:
+    git:
+      url: https://github.com/my-user/my-repo
+      branch: master
+  template:
