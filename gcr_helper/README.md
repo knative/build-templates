@@ -4,6 +4,25 @@ This script provisions (or verifies) a GCP service account with
 permissions to push images to GCR, and loads the credentials into a
 secret in your current kubernetes cluster and namespace.
 
+By default, the following resources will be provisioned:
+
+* A GCP service account named `push-image` with appropriate permissions.
+* A Kubernetes service (named `builder` by default) with secrets to
+  enable pushing to GCR using the `push-image`'s credentials.
+
+
+To use, simply add a `serviceAccountName: builder` entry to your build definition
+
+```yaml:
+apiVersion: build.dev/v1alpha1
+kind: Build
+metadata:
+  name: mybuild
+spec:
+  serviceAccountName: builder
+  source: ...
+  template: ...
+```
 
 ## Usage
 
@@ -38,17 +57,4 @@ Found serviceAccount 'builder' with access to 'gcr-creds'
 created key [462561f97c7fc567f167b4cef8e9bfedde992143] of type [json] as [image-push-key.json] for [push-image@$PROJECT_ID.iam.gserviceaccount.com]
 serviceaccount "builder" configured
 secret "gcr-creds" created
-```
-
-To use, simply add a `serviceAccountName: builder` entry to your build definition
-
-```yaml:
-apiVersion: build.dev/v1alpha1
-kind: Build
-metadata:
-  name: mybuild
-spec:
-  serviceAccountName: builder
-  source: ...
-  template: ...
 ```
