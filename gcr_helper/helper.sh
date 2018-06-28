@@ -1,5 +1,19 @@
 #!/bin/bash
 #
+# Copyright 2018 Google, Inc. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 # A simple script to create or validate credentials to allow pushing
 # built images to gcr.io.
 #
@@ -34,7 +48,7 @@
 
 checkBinary() {
     if ! which $1 >&/dev/null; then
-        echo "Unable to locate $1, please ensure it is installed and on your $PATH."
+        echo "Unable to locate $1, please ensure it is installed and on your \$PATH."
         exit 1
     fi
 }
@@ -56,14 +70,14 @@ if ! kubectl $KUBECTL_FLAGS get sa >& /dev/null; then
     exit 1
 fi
 
-KUBE_SA=${2:-"builder"}
+readonly KUBE_SA=${2:-"builder"}
 
 
 ##
 ## Begin doing things
 ##
 
-echo ${GCP_SA_NAME:=push-image} >& /dev/null
+: ${GCP_SA_NAME:=push-image}
 readonly GCP_SA=$GCP_SA_NAME@$PROJECT_ID.iam.gserviceaccount.com
 
 # Supress stderr, as many of the check queries will print extra output
@@ -145,8 +159,8 @@ data:
   password: $(base64 -w 0 image-push-key.json)
 EOF
 
-EXIT=$?
+readonly EXIT=$?
 
 rm image-push-key.json
 
-exit $?
+exit $EXIT
