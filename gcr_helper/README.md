@@ -14,7 +14,7 @@ By default, the following resources will be provisioned:
 To use, simply add a `serviceAccountName: builder` entry to your build definition
 
 ```yaml:
-apiVersion: build.dev/v1alpha1
+apiVersion: build.knative.dev/v1alpha1
 kind: Build
 metadata:
   name: mybuild

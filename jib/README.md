@@ -35,7 +35,7 @@ for more information.
 To use the `jib-maven` template:
 
 ```
-apiVersion: build.dev/v1alpha1
+apiVersion: build.knative.dev/v1alpha1
 kind: Build
 metadata:
   name: jib-maven-build
@@ -63,7 +63,7 @@ See [setup instructions for
 Gradle](https://github.com/GoogleContainerTools/jib/tree/master/jib-gradle-plugin#setup).
 
 ```
-apiVersion: build.dev/v1alpha1
+apiVersion: build.knative.dev/v1alpha1
 kind: Build
 metadata:
   name: jib-gradle-build

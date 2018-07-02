@@ -35,7 +35,7 @@ popular programming languages, like
 ## Usage
 
 ```
-apiVersion: build.dev/v1alpha1
+apiVersion: build.knative.dev/v1alpha1
 kind: Build
 metadata:
   name: bazel-build

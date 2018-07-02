@@ -24,7 +24,7 @@ directive, without requiring access to the daemon socket.
 ## Usage
 
 ```
-apiVersion: build.dev/v1alpha1
+apiVersion: build.knative.dev/v1alpha1
 kind: Build
 metadata:
   name: kaniko-build

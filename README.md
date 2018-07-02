@@ -27,7 +27,7 @@ With the build template installed, you can define a build that uses that
 template, being sure to provide values for required parameters:
 
 ```
-apiVersion: build.dev/v1alpha1
+apiVersion: build.knative.dev/v1alpha1
 kind: Build
 metadata:
   name: buildpack-build

@@ -25,7 +25,7 @@ the resulting application image to a Docker registry under the provided name.
 ## Usage
 
 ```
-apiVersion: build.dev/v1alpha1
+apiVersion: build.knative.dev/v1alpha1
 kind: Build
 metadata:
   name: buildpack-build
