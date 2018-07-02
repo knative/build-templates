@@ -149,10 +149,10 @@ kind: Secret
 metadata:
   name: gcr-creds
   annotations:
-    build.dev/docker-0: https://us.gcr.io
-    build.dev/docker-1: https://gcr.io
-    build.dev/docker-2: https://eu.gcr.io
-    build.dev/docker-3: https://asia.gcr.io
+    build.knative.dev/docker-0: https://us.gcr.io
+    build.knative.dev/docker-1: https://gcr.io
+    build.knative.dev/docker-2: https://eu.gcr.io
+    build.knative.dev/docker-3: https://asia.gcr.io
 type: kubernetes.io/basic-auth
 data:
   username: $(echo -n "_json_key" | base64 -w 0) # Should be X2pzb25fa2V5
