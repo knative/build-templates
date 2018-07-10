@@ -33,7 +33,7 @@ spec:
   source:
     git:
       url: https://github.com/my-user/my-repo
-      branch: master
+      revision: master
   template:
     name: buildpack
     arguments:
