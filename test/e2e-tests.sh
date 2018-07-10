@@ -132,8 +132,8 @@ if (( IS_PROW )) || [[ -n ${PROJECT_ID} ]]; then
   kubectl apply -f ${SERVING_RELEASE}
   exit_if_test_failed "could not install Knative Serving"
 
-  wait_until_pods_running knative-serving
-  wait_until_pods_running knative-build
+  wait_until_pods_running knative-serving || exit_if_test_failed
+  wait_until_pods_running knative-build || exit_if_test_failed
 fi
 
 header "Running tests"
