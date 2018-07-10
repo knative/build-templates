@@ -121,8 +121,14 @@ fi
 
 # Install Knative Build if not using an existing cluster
 if (( IS_PROW )) || [[ -n ${PROJECT_ID} ]]; then
+  # Make sure we're in the default namespace. Currently kubetest switches to
+  # test-pods namespace when creating the cluster.
+  kubectl config set-context \
+    $(kubectl config current-context) --namespace=default
+
   header "Starting Knative Serving"
-  acquire_cluster_admin_role $(gcloud config get-value core/account) ${E2E_CLUSTER_NAME} ${E2E_CLUSTER_ZONE}
+  acquire_cluster_admin_role \
+    $(gcloud config get-value core/account) ${E2E_CLUSTER_NAME} ${E2E_CLUSTER_ZONE}
   subheader "Installing Istio"
   kubectl apply -f ${ISTIO_YAML}
   wait_until_pods_running istio-system
