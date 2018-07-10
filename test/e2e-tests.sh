@@ -62,10 +62,6 @@ function exit_if_test_failed() {
   echo "***           TEST FAILED           ***"
   echo "***    Start of information dump    ***"
   echo "***************************************"
-  if (( IS_PROW )) || [[ $PROJECT_ID != "" ]]; then
-    echo ">>> Project info:"
-    gcloud compute project-info describe
-  fi
   echo ">>> All resources:"
   kubectl get all --all-namespaces
   echo "***************************************"
@@ -131,13 +127,13 @@ if (( IS_PROW )) || [[ -n ${PROJECT_ID} ]]; then
   kubectl apply -f ${ISTIO_YAML}
   wait_until_pods_running istio-system
   exit_if_test_failed "could not install Istio"
-  kubectl label namespace default istio-injection=enabled
 
   subheader "Installing Knative Serving"
   kubectl apply -f ${SERVING_RELEASE}
   exit_if_test_failed "could not install Knative Serving"
 
-  wait_until_pods_running build-system
+  wait_until_pods_running knative-serving
+  wait_until_pods_running knative-build
 fi
 
 header "Running tests"
