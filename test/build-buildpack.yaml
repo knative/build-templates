@@ -1,4 +1,4 @@
-apiVersion: build.dev/v1alpha1
+apiVersion: build.knative.dev/v1alpha1
 kind: Build
 metadata:
   name: buildpack-build
@@ -6,5 +6,9 @@ spec:
   source:
     git:
       url: https://github.com/my-user/my-repo
-      branch: master
+      revision: v1.0
   template:
+    name: buildpack
+    arguments:
+    - name: IMAGE
+      value: us.gcr.io/my-project/my-app
