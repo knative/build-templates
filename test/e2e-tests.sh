@@ -33,7 +33,7 @@ readonly E2E_CLUSTER_NODES=2
 readonly E2E_CLUSTER_MACHINE=n1-standard-2
 readonly TEST_RESULT_FILE=/tmp/bldtpl-e2e-result
 readonly ISTIO_YAML=https://storage.googleapis.com/knative-releases/latest/istio.yaml
-readonly SERVING_RELEASE=https://storage.googleapis.com/knative-releases/latest/release.yaml
+readonly BUILD_RELEASE=https://storage.googleapis.com/build-crd/latest/release.yaml
 
 # This script.
 readonly SCRIPT_CANONICAL_PATH="$(readlink -f ${BASH_SOURCE})"
@@ -126,7 +126,7 @@ if (( IS_PROW )) || [[ -n ${PROJECT_ID} ]]; then
   kubectl config set-context \
     $(kubectl config current-context) --namespace=default
 
-  header "Starting Knative Serving"
+  header "Starting Knative Build"
   acquire_cluster_admin_role \
     $(gcloud config get-value core/account) ${E2E_CLUSTER_NAME} ${E2E_CLUSTER_ZONE}
   subheader "Installing Istio"
@@ -134,11 +134,10 @@ if (( IS_PROW )) || [[ -n ${PROJECT_ID} ]]; then
   wait_until_pods_running istio-system
   exit_if_test_failed "could not install Istio"
 
-  subheader "Installing Knative Serving"
-  kubectl apply -f ${SERVING_RELEASE}
-  exit_if_test_failed "could not install Knative Serving"
+  subheader "Installing Knative Build"
+  kubectl apply -f ${BUILD_RELEASE}
+  exit_if_test_failed "could not install Knative Build"
 
-  wait_until_pods_running knative-serving || exit_if_test_failed
   wait_until_pods_running knative-build || exit_if_test_failed
 fi
 
