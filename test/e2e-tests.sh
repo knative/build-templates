@@ -23,7 +23,7 @@
 # Calling this script without arguments will create a new cluster in
 # project $PROJECT_ID, run the tests and delete the cluster.
 
-[ -f /library.sh ] && source /library.sh || eval "$(docker run --entrypoint sh gcr.io/knative-tests/test-infra/prow-tests -c 'cat library.sh')"
+[ -f /workspace/library.sh ] && source /workspace/library.sh || eval "$(docker run --entrypoint sh gcr.io/knative-tests/test-infra/prow-tests -c 'cat library.sh')"
 [ -v KNATIVE_TEST_INFRA ] || exit 1
 
 # Test cluster parameters and location of test files

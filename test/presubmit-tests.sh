@@ -24,7 +24,7 @@ set -o pipefail
 # Extensions or file patterns that don't require presubmit tests
 readonly NO_PRESUBMIT_FILES=(\.md \.png ^OWNERS)
 
-[ -f /library.sh ] && source /library.sh || eval "$(docker run --entrypoint sh gcr.io/knative-tests/test-infra/prow-tests -c 'cat library.sh')"
+[ -f /workspace/library.sh ] && source /workspace/library.sh || eval "$(docker run --entrypoint sh gcr.io/knative-tests/test-infra/prow-tests -c 'cat library.sh')"
 [ -v KNATIVE_TEST_INFRA ] || exit 1
 
 # Helper functions.
