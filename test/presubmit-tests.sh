@@ -24,7 +24,8 @@ set -o pipefail
 # Extensions or file patterns that don't require presubmit tests
 readonly NO_PRESUBMIT_FILES=(\.md \.png ^OWNERS)
 
-source "$(dirname $(readlink -f ${BASH_SOURCE}))/library.sh"
+[ -f /workspace/library.sh ] && source /workspace/library.sh || eval "$(docker run --entrypoint sh gcr.io/knative-tests/test-infra/prow-tests -c 'cat library.sh')"
+[ -v KNATIVE_TEST_INFRA ] || exit 1
 
 # Helper functions.
 
@@ -63,7 +64,7 @@ if ! (( RUN_BUILD_TESTS+RUN_UNIT_TESTS+RUN_INTEGRATION_TESTS )); then
   exit 1
 fi
 
-cd ${BUILDTEMPLATES_ROOT_DIR}
+cd ${REPO_ROOT_DIR}
 
 # Skip presubmit tests if whitelisted files were changed.
 if [[ -n "${PULL_PULL_SHA}" ]]; then
