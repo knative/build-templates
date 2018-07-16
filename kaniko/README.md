@@ -32,7 +32,7 @@ For an example on how to create such a _ServiceAccount_ to push an image to Dock
 
 ## Usage
 
-Write a _build_ manifest and use the _template_ section to refer to the kaniko build template. Set the value of the parameters such as the destination Docker image, note the use of the _serviceAccountName_ to push the image to a remote registry.
+Write a _build_ manifest and use the _template_ section to refer to the kaniko build template. Set the value of the parameters such as the destination Docker image. Note the use of the `serviceAccountName` to push the image to a remote registry.
 
 ```
 apiVersion: build.knative.dev/v1alpha1
@@ -40,7 +40,7 @@ kind: Build
 metadata:
   name: kaniko-build
 spec:
-  serviceAccountName: build
+  serviceAccountName: build-bot
   source:
     git:
       url: https://github.com/my-user/my-repo
