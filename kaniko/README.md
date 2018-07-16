@@ -26,13 +26,13 @@ kubectl apply -f kaniko.yaml
 
 ## ServiceAccount
 
-kaniko builds an image and pushes it to the destination defined as a parameter. In order to properly authenticate to the remote container registry, the build needs to have the proper credentials. This is achieved using a build _ServiceAccount_.
+kaniko builds an image and pushes it to the destination defined as a parameter. In order to properly authenticate to the remote container registry, the build needs to have the proper credentials. This is achieved using a build `ServiceAccount`.
 
-For an example on how to create such a _ServiceAccount_ to push an image to Docker hub, see the [Authentication](https://github.com/knative/docs/blob/master/build/auth.md#basic-authentication-docker) documentation page.
+For an example on how to create such a `ServiceAccount` to push an image to Docker hub, see the [Authentication](https://github.com/knative/docs/blob/master/build/auth.md#basic-authentication-docker) documentation page.
 
 ## Usage
 
-Write a _build_ manifest and use the _template_ section to refer to the kaniko build template. Set the value of the parameters such as the destination Docker image. Note the use of the `serviceAccountName` to push the image to a remote registry.
+Write a `Build` manifest and use the `template` section to refer to the kaniko build template. Set the value of the parameters such as the destination Docker image. Note the use of the `serviceAccountName` to push the image to a remote registry.
 
 ```
 apiVersion: build.knative.dev/v1alpha1
