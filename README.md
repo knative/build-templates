@@ -1,10 +1,9 @@
 # Knative Build Templates
 
 This repository contains a library of
-[`BuildTemplate` resources](https://github.com/knative/build) which
-are designed to be reusable by many applications. Each build template
-is in a separate directory along with a README.md, so you can choose
-which build templates to install on your cluster.
+`BuildTemplate` [resources](https://github.com/knative/docs/blob/master/build/build-templates.md) which are designed to be reusable by many applications.
+
+Each build template is in a separate directory along with a README.md and a Kubernetes manifest, so you can choose which build templates to install on your cluster.
 
 ## Using Build Templates
 
@@ -37,10 +36,10 @@ spec:
       url: https://github.com/my-user/my-repo
       revision: master
   template:
-  name: buildpack
-  arguments:
-  - name: IMAGE
-    value: us.gcr.io/my-project/my-app
+    name: buildpack
+    arguments:
+    - name: IMAGE
+      value: us.gcr.io/my-project/my-app
 ```
 
 Next, create the build you defined:
@@ -55,3 +54,9 @@ You can check the status of the build using `kubectl`:
 ```
 $ kubectl get build buildpack-build -oyaml
 ```
+
+## Contributing and Support
+
+If you want to contribute to this repository, please see our [contributing](./CONTRIBUTING.md) guidelines.
+
+If you are looking for support, enter an [issue](https://github.com/knative/build-templates/issues/new) or join our [Slack workspace](https://knative.slack.com/)

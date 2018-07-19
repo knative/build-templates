@@ -23,7 +23,8 @@
 # Calling this script without arguments will create a new cluster in
 # project $PROJECT_ID, run the tests and delete the cluster.
 
-source "$(dirname $(readlink -f ${BASH_SOURCE}))/library.sh"
+[ -f /workspace/library.sh ] && source /workspace/library.sh || eval "$(docker run --entrypoint sh gcr.io/knative-tests/test-infra/prow-tests -c 'cat library.sh')"
+[ -v KNATIVE_TEST_INFRA ] || exit 1
 
 # Test cluster parameters and location of test files
 readonly E2E_CLUSTER_NAME=bldtpl-e2e-cluster${BUILD_NUMBER}
@@ -32,8 +33,6 @@ readonly E2E_CLUSTER_ZONE=us-central1-a
 readonly E2E_CLUSTER_NODES=2
 readonly E2E_CLUSTER_MACHINE=n1-standard-2
 readonly TEST_RESULT_FILE=/tmp/bldtpl-e2e-result
-readonly ISTIO_YAML=https://storage.googleapis.com/knative-releases/latest/istio.yaml
-readonly SERVING_RELEASE=https://storage.googleapis.com/knative-releases/latest/release.yaml
 
 # This script.
 readonly SCRIPT_CANONICAL_PATH="$(readlink -f ${BASH_SOURCE})"
@@ -62,10 +61,6 @@ function exit_if_test_failed() {
   echo "***           TEST FAILED           ***"
   echo "***    Start of information dump    ***"
   echo "***************************************"
-  if (( IS_PROW )) || [[ $PROJECT_ID != "" ]]; then
-    echo ">>> Project info:"
-    gcloud compute project-info describe
-  fi
   echo ">>> All resources:"
   kubectl get all --all-namespaces
   echo "***************************************"
@@ -77,7 +72,7 @@ function exit_if_test_failed() {
 
 # Script entry point.
 
-cd ${BUILDTEMPLATES_ROOT_DIR}
+cd ${REPO_ROOT_DIR}
 
 # Show help if bad arguments are passed.
 if [[ -n $1 && $1 != "--run-tests" ]]; then
@@ -125,19 +120,24 @@ fi
 
 # Install Knative Build if not using an existing cluster
 if (( IS_PROW )) || [[ -n ${PROJECT_ID} ]]; then
-  header "Starting Knative Serving"
-  acquire_cluster_admin_role $(gcloud config get-value core/account) ${E2E_CLUSTER_NAME} ${E2E_CLUSTER_ZONE}
+  # Make sure we're in the default namespace. Currently kubetest switches to
+  # test-pods namespace when creating the cluster.
+  kubectl config set-context \
+    $(kubectl config current-context) --namespace=default
+
+  header "Starting Knative Build"
+  acquire_cluster_admin_role \
+    $(gcloud config get-value core/account) ${E2E_CLUSTER_NAME} ${E2E_CLUSTER_ZONE}
   subheader "Installing Istio"
-  kubectl apply -f ${ISTIO_YAML}
+  kubectl apply -f ${KNATIVE_ISTIO_YAML}
   wait_until_pods_running istio-system
   exit_if_test_failed "could not install Istio"
-  kubectl label namespace default istio-injection=enabled
 
-  subheader "Installing Knative Serving"
-  kubectl apply -f ${SERVING_RELEASE}
-  exit_if_test_failed "could not install Knative Serving"
+  subheader "Installing Knative Build"
+  kubectl apply -f ${KNATIVE_BUILD_RELEASE}
+  exit_if_test_failed "could not install Knative Build"
 
-  wait_until_pods_running build-system
+  wait_until_pods_running knative-build || exit_if_test_failed
 fi
 
 header "Running tests"

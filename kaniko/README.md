@@ -3,16 +3,19 @@
 This build template builds source into a container image using Google's
 [`kaniko`](https://github.com/GoogleCloudPlatform/kaniko) tool.
 
-Kaniko understands the
-[`Dockerfile`](https://docs.docker.com/engine/reference/builder/) format used by
-Docker to build container images using `docker build`, but is able to build
-images without requiring access to the Docker daemon socket, which gives
-expansive power to your build system and is not secure to run inside a
-Kubernetes cluster.
+>kaniko doesn't depend on a Docker daemon and executes each command within a Dockerfile completely in userspace.
+>This enables building container images in environments that can't easily or securely run a Docker daemon, such as a standard Kubernetes cluster.
+> - [Kaniko website](https://github.com/GoogleCloudPlatform/kaniko)
 
-Instead, Kaniko executes directives in the `Dockerfile` inside a container,
-and takes snapshots and uploads layers to the container registry after each
-directive, without requiring access to the daemon socket.
+kaniko is meant to be run as an image, `gcr.io/kaniko-project/executor`. This makes it a perfect tool to be part of a Knative build.
+
+## Create the template
+
+Given a Kubernetes cluster with the Knative [build system](https://github.com/knative/build) running in it, download the template in this directory and use `kubectl` to create it.
+
+```
+kubectl apply -f kaniko.yaml
+```
 
 ## Parameters
 
@@ -21,7 +24,15 @@ directive, without requiring access to the daemon socket.
 * **DOCKERFILE**: The path to the `Dockerfile` to execute (_default:_
   `./Dockerfile`)
 
+## ServiceAccount
+
+kaniko builds an image and pushes it to the destination defined as a parameter. In order to properly authenticate to the remote container registry, the build needs to have the proper credentials. This is achieved using a build `ServiceAccount`.
+
+For an example on how to create such a `ServiceAccount` to push an image to Docker hub, see the [Authentication](https://github.com/knative/docs/blob/master/build/auth.md#basic-authentication-docker) documentation page.
+
 ## Usage
+
+Write a `Build` manifest and use the `template` section to refer to the kaniko build template. Set the value of the parameters such as the destination Docker image. Note the use of the `serviceAccountName` to push the image to a remote registry.
 
 ```
 apiVersion: build.knative.dev/v1alpha1
@@ -29,6 +40,7 @@ kind: Build
 metadata:
   name: kaniko-build
 spec:
+  serviceAccountName: build-bot
   source:
     git:
       url: https://github.com/my-user/my-repo
