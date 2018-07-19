@@ -32,7 +32,13 @@ See [setup instructions for
 Maven](https://github.com/GoogleContainerTools/jib/tree/master/jib-maven-plugin#setup)
 for more information.
 
-To use the `jib-maven` template:
+To use the `jib-maven` template, first install the template:
+
+```
+kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/jib/jib-maven.yaml
+```
+
+Then, define a build that instantiates the template:
 
 ```
 apiVersion: build.knative.dev/v1alpha1
@@ -61,6 +67,14 @@ plugins {
 
 See [setup instructions for
 Gradle](https://github.com/GoogleContainerTools/jib/tree/master/jib-gradle-plugin#setup).
+
+To use the `jib-gradle` template, first install the template:
+
+```
+kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/jib/jib-gradle.yaml
+```
+
+Then, define a build that instantiates the template:
 
 ```
 apiVersion: build.knative.dev/v1alpha1

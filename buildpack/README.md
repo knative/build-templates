@@ -8,6 +8,12 @@ system detects the source language and runtime, identifies a suitable base
 image, and builds the application source on top of that base image, and pushes
 the resulting application image to a Docker registry under the provided name.
 
+## Create the template
+
+```
+kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/buildpack/buildpack.yaml
+```
+
 ## Parameters
 
 * **IMAGE:** The Docker image name to apply to the newly built image.

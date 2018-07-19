@@ -28,6 +28,12 @@ popular programming languages, like
 [Java](https://github.com/bazelbuild/rules_docker/#java_image),
 [Go](https://github.com/bazelbuild/rules_docker/#go_image) and many more.
 
+## Create the template
+
+```
+kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/bazel/bazel.yaml
+```
+
 ## Parameters
 
 * **TARGET**: The Bazel `container_push` target to run.
