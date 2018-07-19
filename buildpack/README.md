@@ -11,7 +11,7 @@ the resulting application image to a Docker registry under the provided name.
 ## Create the template
 
 ```
-kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/buildpack/buildpack.yaml
+kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/master/buildpack/buildpack.yaml
 ```
 
 ## Parameters

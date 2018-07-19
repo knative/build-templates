@@ -15,7 +15,7 @@ makes it a perfect tool to be part of a Knative build.
 ## Create the template
 
 ```
-kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/kaniko/kaniko.yaml
+kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/master/kaniko/kaniko.yaml
 ```
 
 ## Parameters

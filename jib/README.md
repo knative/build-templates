@@ -35,7 +35,7 @@ for more information.
 To use the `jib-maven` template, first install the template:
 
 ```
-kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/jib/jib-maven.yaml
+kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/master/jib/jib-maven.yaml
 ```
 
 Then, define a build that instantiates the template:
@@ -71,7 +71,7 @@ Gradle](https://github.com/GoogleContainerTools/jib/tree/master/jib-gradle-plugi
 To use the `jib-gradle` template, first install the template:
 
 ```
-kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/jib/jib-gradle.yaml
+kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/master/jib/jib-gradle.yaml
 ```
 
 Then, define a build that instantiates the template:

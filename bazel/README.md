@@ -31,7 +31,7 @@ popular programming languages, like
 ## Create the template
 
 ```
-kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/bazel/bazel.yaml
+kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/master/bazel/bazel.yaml
 ```
 
 ## Parameters
