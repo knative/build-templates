@@ -7,7 +7,7 @@ secret in your current kubernetes cluster and namespace.
 By default, the following resources will be provisioned:
 
 * A GCP service account named `push-image` with appropriate permissions.
-* A Kubernetes service (named `builder` by default) with secrets to
+* A Kubernetes service account (named `builder` by default) with secrets to
   enable pushing to GCR using the `push-image`'s credentials.
 
 
