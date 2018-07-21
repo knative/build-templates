@@ -155,8 +155,8 @@ metadata:
     build.knative.dev/docker-3: https://asia.gcr.io
 type: kubernetes.io/basic-auth
 data:
-  username: $(echo -n "_json_key" | base64 -w 0) # Should be X2pzb25fa2V5
-  password: $(base64 -w 0 image-push-key.json)
+  username: $(echo -n "_json_key" | openssl base64 -a -A) # Should be X2pzb25fa2V5
+  password: $(openssl base64 -a -A < image-push-key.json)
 EOF
 
 readonly EXIT=$?
