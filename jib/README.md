@@ -49,7 +49,7 @@ spec:
   source:
     git:
       url: https://github.com/my-user/my-repo
-      branch: master
+      revision: master
   template:
     name: jib-maven
 ```
@@ -85,7 +85,7 @@ spec:
   source:
     git:
       url: https://github.com/my-user/my-repo
-      branch: master
+      revision: master
   template:
     name: jib-gradle
 ```
