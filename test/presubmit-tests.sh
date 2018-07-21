@@ -18,6 +18,7 @@
 # It is started by prow for each PR.
 # For convenience, it can also be executed manually.
 
+# Load github.com/knative/test-infra/images/prow-tests/scripts/presubmit-tests.sh
 [ -f /workspace/presubmit-tests.sh ] \
   && source /workspace/presubmit-tests.sh \
   || eval "$(docker run --entrypoint sh gcr.io/knative-tests/test-infra/prow-tests -c 'cat presubmit-tests.sh')"
