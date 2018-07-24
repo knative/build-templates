@@ -22,7 +22,9 @@ This assumes the source repo is using the Maven plugin, configured in your
   <artifactId>jib-maven-plugin</artifactId>
   <version>0.9.7</version>
   <configuration>
-    <to>myregistry/myapp</registry>
+    <to>
+      <image>myregistry/myapp</image>
+    </to>
   </configuration>
 </plugin>
 ```
@@ -62,6 +64,8 @@ This assumes the source repo is using the Gradle plugin, configured in
 plugins {
   id 'com.google.cloud.tools.jib' version '0.9.7'
 }
+
+jib.to.image = 'myregistry/myimage'
 ```
 
 See [setup instructions for
