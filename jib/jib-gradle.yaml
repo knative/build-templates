@@ -6,4 +6,4 @@ spec:
   steps:
   - name: build-and-push
     image: gcr.io/cloud-builders/gradle
-    args: ['build', 'jib']
+    args: ['jib']

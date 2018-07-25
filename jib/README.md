@@ -20,10 +20,11 @@ This assumes the source repo is using the Maven plugin, configured in your
 <plugin>
   <groupId>com.google.cloud.tools</groupId>
   <artifactId>jib-maven-plugin</artifactId>
-  <version>0.1.6</version>
+  <version>0.9.7</version>
   <configuration>
-    <registry>myregistry</registry>
-    <repository>myapp</repository>
+    <to>
+      <image>myregistry/myapp</image>
+    </to>
   </configuration>
 </plugin>
 ```
@@ -61,8 +62,10 @@ This assumes the source repo is using the Gradle plugin, configured in
 
 ```
 plugins {
-  id 'com.google.cloud.tools.jib' version '0.1.1'
+  id 'com.google.cloud.tools.jib' version '0.9.7'
 }
+
+jib.to.image = 'myregistry/myimage'
 ```
 
 See [setup instructions for
