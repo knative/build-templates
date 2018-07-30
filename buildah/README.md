@@ -21,7 +21,7 @@ to assemble a container image, then pushes that image to a container registry.
 ## Usage
 
 ```
-apiVersion: build.dev/v1alpha1
+apiVersion: build.knative.dev/v1alpha1
 kind: Build
 metadata:
   name: buildah-build
@@ -29,7 +29,7 @@ spec:
   source:
     git:
       url: https://github.com/my-user/my-repo
-      branch: master
+      revision: master
   template:
     name: buildah
     arguments:
