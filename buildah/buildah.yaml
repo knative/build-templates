@@ -15,14 +15,14 @@ spec:
   steps:
   - name: build
     image: ${BUILDER_IMAGE}
-    args: ['bud', '-f', '${DOCKERFILE}', '-t', 'image', '.']
+    args: ['--storage-driver=vfs', 'bud', '-f', '${DOCKERFILE}', '-t', 'image', '.']
     volumeMounts:
     - name: varlibcontainers
       mountPath: /var/lib/containers
 
   - name: push
     image: ${BUILDER_IMAGE}
-    args: ['push', 'image', 'docker://${IMAGE}']
+    args: ['--storage-driver=vfs', 'push', 'image', 'docker://${IMAGE}']
     volumeMounts:
     - name: varlibcontainers
       mountPath: /var/lib/containers
