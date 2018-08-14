@@ -20,12 +20,7 @@ This assumes the source repo is using the Maven plugin, configured in your
 <plugin>
   <groupId>com.google.cloud.tools</groupId>
   <artifactId>jib-maven-plugin</artifactId>
-  <version>0.9.7</version>
-  <configuration>
-    <to>
-      <image>myregistry/myapp</image>
-    </to>
-  </configuration>
+  <version>0.9.8</version>
 </plugin>
 ```
 
@@ -53,6 +48,9 @@ spec:
       revision: master
   template:
     name: jib-maven
+    arguments:
+    - name: IMAGE
+      value: gcr.io/my-project/my-app
 ```
 
 ## Usage (Gradle)
@@ -62,10 +60,8 @@ This assumes the source repo is using the Gradle plugin, configured in
 
 ```
 plugins {
-  id 'com.google.cloud.tools.jib' version '0.9.7'
+  id 'com.google.cloud.tools.jib' version '0.9.8'
 }
-
-jib.to.image = 'myregistry/myimage'
 ```
 
 See [setup instructions for
@@ -91,4 +87,7 @@ spec:
       revision: master
   template:
     name: jib-gradle
+    arguments:
+    - name: IMAGE
+      value: gcr.io/my-project/my-app
 ```
