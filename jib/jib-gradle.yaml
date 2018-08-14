@@ -3,7 +3,14 @@ kind: BuildTemplate
 metadata:
   name: jib-gradle
 spec:
+  parameters:
+  - name: IMAGE
+    description: The name of the image to push
+
   steps:
   - name: build-and-push
     image: gcr.io/cloud-builders/gradle
-    args: ['jib']
+    args:
+    - jib
+    - -Duser.home=/builder/home
+    - --image=${IMAGE}
