@@ -1,0 +1,38 @@
+apiVersion: build.knative.dev/v1alpha1
+kind: BuildTemplate
+metadata:
+  name: buildah
+spec:
+  parameters:
+  - name: BUILDER_IMAGE
+    description: The location of the buildah builder image.
+  - name: IMAGE
+    description: The name of the image to push.
+  - name: DOCKERFILE
+    description: Path to the Dockerfile to build.
+    default: ./Dockerfile
+
+  steps:
+  - name: build
+    image: ${BUILDER_IMAGE}
+    args: ['--storage-driver=vfs', 'bud', '--layers', '-f', '${DOCKERFILE}', '-t', '${IMAGE}', '.']
+    env:
+    - name: "BUILDAH_ISOLATION"
+      value: "chroot"
+    volumeMounts:
+    - name: varlibcontainers
+      mountPath: /var/lib/containers
+
+  - name: push
+    image: ${BUILDER_IMAGE}
+    args: ['--storage-driver=vfs', 'push', '${IMAGE}', 'docker://${IMAGE}']
+    env:
+    - name: "BUILDAH_ISOLATION"
+      value: "chroot"
+    volumeMounts:
+    - name: varlibcontainers
+      mountPath: /var/lib/containers
+
+  volumes:
+  - name: varlibcontainers
+    emptyDir: {}
