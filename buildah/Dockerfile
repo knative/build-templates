@@ -1,11 +1,8 @@
 FROM centos
+ARG RUNC_REVISION="master"
+ARG BUILDAH_REVISION="master"
 
 RUN \
-  # Install runc first, fail fast if something is wrong.
-  yum -y install wget && \
-  wget -O /bin/runc https://github.com/opencontainers/runc/releases/download/v1.0.0-rc5/runc.amd64 && \
-  chmod +x /bin/runc && \
-  runc --help && \
   # Install buildah dependencies.
   yum -y install \
     make \
@@ -27,8 +24,15 @@ RUN \
   mkdir ~/buildah && \
   cd ~/buildah && \
   export GOPATH=`pwd` && \
+  git clone https://github.com/opencontainers/runc ./src/github.com/opencontainers/runc && \
+  cd $GOPATH/src/github.com/opencontainers/runc && \
+  git checkout "${RUNC_REVISION}" && \
+  make runc && \
+  mv runc /usr/bin/runc && \
+  cd $GOPATH/ && \
   git clone https://github.com/projectatomic/buildah ./src/github.com/projectatomic/buildah && \
-  cd ./src/github.com/projectatomic/buildah && \
+  cd $GOPATH/src/github.com/projectatomic/buildah && \
+  git checkout "${BUILDAH_REVISION}" && \
   make && \
   make install && \
   buildah --help
