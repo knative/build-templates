@@ -26,7 +26,7 @@ spec:
   - name: build
     image: packs/cf:build
     args: ["-skipDetect=${SKIP_DETECT}", "-buildpackOrder=${BUILDPACK_ORDER}"]
-    workingdir: "${DIRECTORY}"
+    workingDir: "${DIRECTORY}"
     volumeMounts:
     - name: droplet
       mountPath: /out
@@ -37,7 +37,7 @@ spec:
   # Out: an image published as $IMAGE
   - name: export
     image: packs/cf:export
-    workingdir: /in
+    workingDir: /in
     args: ["${IMAGE}"]
     volumeMounts:
     - name: droplet
