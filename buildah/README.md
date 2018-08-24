@@ -17,6 +17,8 @@ to assemble a container image, then pushes that image to a container registry.
   (_required_)
 * **DOCKERFILE**: The path to the `Dockerfile` to execute (_default:_
   `./Dockerfile`)
+* **TLSVERIFY**: Verify the TLS on the registry endpoint (for push/pull to a
+  non-TLS registry)
 
 ## Usage
 
@@ -24,7 +26,7 @@ to assemble a container image, then pushes that image to a container registry.
 apiVersion: build.knative.dev/v1alpha1
 kind: Build
 metadata:
-  name: buildah-build
+  name: buildah-build-my-repo
 spec:
   source:
     git:

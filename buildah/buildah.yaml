@@ -11,24 +11,21 @@ spec:
   - name: DOCKERFILE
     description: Path to the Dockerfile to build.
     default: ./Dockerfile
+  - name: TLSVERIFY
+    description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)
+    default: true
 
   steps:
   - name: build
     image: ${BUILDER_IMAGE}
-    args: ['--storage-driver=vfs', 'bud', '--layers', '-f', '${DOCKERFILE}', '-t', '${IMAGE}', '.']
-    env:
-    - name: "BUILDAH_ISOLATION"
-      value: "chroot"
+    args: ['bud', '--tls-verify=${TLSVERIFY}', '--layers', '-f', '${DOCKERFILE}', '-t', '${IMAGE}', '.']
     volumeMounts:
     - name: varlibcontainers
       mountPath: /var/lib/containers
 
   - name: push
     image: ${BUILDER_IMAGE}
-    args: ['--storage-driver=vfs', 'push', '${IMAGE}', 'docker://${IMAGE}']
-    env:
-    - name: "BUILDAH_ISOLATION"
-      value: "chroot"
+    args: ['push', '--tls-verify=${TLSVERIFY}', '${IMAGE}', 'docker://${IMAGE}']
     volumeMounts:
     - name: varlibcontainers
       mountPath: /var/lib/containers
