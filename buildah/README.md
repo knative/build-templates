@@ -18,7 +18,7 @@ to assemble a container image, then pushes that image to a container registry.
 * **DOCKERFILE**: The path to the `Dockerfile` to execute (_default:_
   `./Dockerfile`)
 * **TLSVERIFY**: Verify the TLS on the registry endpoint (for push/pull to a
-  non-TLS registry)
+  non-TLS registry) (_default:_ `true`)
 
 ## Usage
 
