@@ -5,6 +5,15 @@ This repository contains a library of
 
 Each build template is in a separate directory along with a README.md and a Kubernetes manifest, so you can choose which build templates to install on your cluster.
 
+## Build Templates Kinds
+
+There are two kinds of build templates:
+
+ 1. `ClusterBuildTemplates` with a Cluster scope
+ 2. `BuildTemplates` with a Namespace scope
+
+ A default kind of `BuildTemplate` is used if the field `kind` is not set.
+
 ## Using Build Templates
 
 First, install a build template onto your cluster:
@@ -22,6 +31,14 @@ NAME       AGE
 buildpack  3s
 ```
 
+*OR*
+
+```
+$ kubectl get clusterbuildtemplates
+NAME        AGE
+buildpack   9s
+```
+
 With the build template installed, you can define a build that uses that
 template, being sure to provide values for required parameters:
 
@@ -37,6 +54,7 @@ spec:
       revision: master
   template:
     name: buildpack
+    kind: BuildTemplate # (or ClusterBuildTemplate)
     arguments:
     - name: IMAGE
       value: us.gcr.io/my-project/my-app
