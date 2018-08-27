@@ -37,4 +37,6 @@ RUN \
   make install && \
   buildah --help
 
+ENV BUILDAH_ISOLATION chroot
+ENV STORAGE_DRIVER vfs
 ENTRYPOINT ["buildah"]
