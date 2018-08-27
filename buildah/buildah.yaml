@@ -13,7 +13,7 @@ spec:
     default: ./Dockerfile
   - name: TLSVERIFY
     description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)
-    default: true
+    default: "true"
 
   steps:
   - name: build
