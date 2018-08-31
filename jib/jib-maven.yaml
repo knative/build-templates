@@ -12,6 +12,6 @@ spec:
     image: gcr.io/cloud-builders/mvn
     args:
     - compile
-    - jib:build
+    - com.google.cloud.tools:jib-maven-plugin:build
     - -Duser.home=/builder/home
     - -Dimage=${IMAGE}
