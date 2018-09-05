@@ -6,6 +6,9 @@ spec:
   parameters:
   - name: IMAGE
     description: The name of the image to push
+  - name: DIRECTORY
+    description: The directory containing the app, relative to the source repository root
+    default: .
 
   steps:
   - name: build-and-push
@@ -14,3 +17,4 @@ spec:
     - jib
     - -Duser.home=/builder/home
     - --image=${IMAGE}
+    workingDir: /workspace/${DIRECTORY}
