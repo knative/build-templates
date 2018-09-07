@@ -53,6 +53,18 @@ See [setup instructions for Maven](https://github.com/GoogleContainerTools/jib/t
 Using a persistent volume for caching can speed up your builds. To set up the cache, define a `PersistentVolumeClaim` and attach a corresponding volume to the `Build`:
 
 ```yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: jib-build-cache
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 8Gi
+---
 apiVersion: build.knative.dev/v1alpha1
 kind: Build
 metadata:
@@ -74,18 +86,6 @@ spec:
   - name: persistent-cache
     persistentVolumeClaim:
       claimName: jib-build-cache
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: jib-build-cache
-spec:
-  accessModes:
-    - ReadWriteOnce
-  volumeMode: Filesystem
-  resources:
-    requests:
-      storage: 8Gi
 ```
 
 This creates a `PersistentVolumeClaim` with 8Gi of storage and attaches it to the build by setting the `CACHE` argument on `spec.template.arguments`.
