@@ -16,15 +16,49 @@ spec:
   steps:
   - name: build-and-push
     image: gcr.io/cloud-builders/gradle
+    command:
+    - sh
+    - -c
     args:
-    - jib
-    - -Duser.home=/builder/home
-    - --image=${IMAGE}
+    - |
+      # Adds Gradle init script that applies the Jib Gradle plugin.
+      echo "\
+      initscript {
+        repositories {
+          maven {
+            url 'https://plugins.gradle.org/m2'
+          }
+        }
+        dependencies {
+          classpath 'gradle.plugin.com.google.cloud.tools:jib-gradle-plugin:+'
+        }
+      }
+
+      // Only applies the Jib plugin if the project does not apply it already.
+      rootProject {
+        afterEvaluate {
+          if (!project.plugins.hasPlugin('com.google.cloud.tools.jib')) {
+            project.apply plugin: com.google.cloud.tools.jib.gradle.JibPlugin
+          }
+        }
+      }\
+      " > /builder/home/auto-jib.gradle
+
+      # Runs the Gradle Jib build.
+      gradle jib \
+        --init-script=/builder/home/auto-jib.gradle \
+        -Dgradle.user.home=/builder/home/.gradle \
+        -Duser.home=/builder/home \
+        --image=${IMAGE}
+
     workingDir: /workspace/${DIRECTORY}
     volumeMounts:
     - name: ${CACHE}
-      mountPath: /builder/home/.m2
-      subPath: m2-cache
+      mountPath: /builder/home/.gradle/caches
+      subPath: gradle-caches
+    - name: ${CACHE}
+      mountPath: /builder/home/.gradle/wrapper
+      subPath: gradle-wrapper
     - name: ${CACHE}
       mountPath: /builder/home/.cache
       subPath: jib-cache
