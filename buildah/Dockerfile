@@ -30,8 +30,8 @@ RUN \
   make runc && \
   mv runc /usr/bin/runc && \
   cd $GOPATH/ && \
-  git clone https://github.com/projectatomic/buildah ./src/github.com/projectatomic/buildah && \
-  cd $GOPATH/src/github.com/projectatomic/buildah && \
+  git clone https://github.com/containers/buildah ./src/github.com/containers/buildah && \
+  cd $GOPATH/src/github.com/containers/buildah && \
   git checkout "${BUILDAH_REVISION}" && \
   make && \
   make install && \
