@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: buildkitd
+  name: buildkitd
+spec:
+  selector:
+    matchLabels:
+      app: buildkitd
+  template:
+    metadata:
+      labels:
+        app: buildkitd
+    spec:
+      containers:
+# moby/buildkit:v0.3.1-rootless is executed as an unprivileged user and does not support overlayfs on most distros.
+# You can use also use moby/buildkit:v0.3.1
+      - image: moby/buildkit:v0.3.1-rootless@sha256:2407cc7f24e154a7b699979c7ced886805cac67920169dcebcca9166493ee2b6
+        args:
+        - --addr
+        - tcp://0.0.0.0:1234
+        name: buildkitd
+        ports:
+        - containerPort: 1234
+        securityContext:
+          privileged: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: buildkitd
+  name: buildkitd
+spec:
+  ports:
+  - port: 1234
+    protocol: TCP
+  selector:
+    app: buildkitd 
