@@ -25,6 +25,7 @@ RUN mkdir ~/runc && \
   git clone https://github.com/opencontainers/runc ./src/github.com/opencontainers/runc && \
   cd $GOPATH/src/github.com/opencontainers/runc && \
   git checkout "${RUNC_REVISION}" && \
+  git log -1 --oneline > /.version.runc && \
   make runc && \
   mv runc /usr/bin/runc
 
@@ -45,8 +46,17 @@ RUN mkdir ~/buildah && \
   make install
 
 FROM centos:7
-RUN yum -y install libarchive ostree lzo libseccomp libedit gpgme
+RUN yum -y install libarchive ostree lzo libseccomp libedit gpgme && \
+  yam clean all && \
+  rm -rf \
+    /var/cache/yum \
+    /usr/share/doc \
+    /usr/share/man \
+    /usr/share/info \
+    /usr/share/locale \
+    /var/log/*
 COPY --from=runc /usr/bin/runc /usr/bin/runc
+COPY --from=runc /.version.runc /.version.runc
 COPY --from=buildah /usr/local/bin/buildah /usr/bin/buildah
 COPY --from=buildah /etc/containers /etc/containers
 ENV BUILDAH_ISOLATION chroot

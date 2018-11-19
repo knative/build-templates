@@ -51,7 +51,8 @@ to change in the future. You can build the image from [the Dockerfile in this
 directory](./Dockerfile), e.g.:
 
 ```
-docker build -t buildah . && docker push buildah
+docker build -t <user>/buildah . && docker push <user>/buildah
 ```
 
-(You could also build the image using `buildah` itself, or `kaniko`)
+You need a relatively recent version of Docker (>= 17.05).
+You could also build the image using `buildah` itself, or `kaniko`
