@@ -12,6 +12,9 @@ spec:
   - name: CACHE
     description: The name of the volume for caching Maven artifacts and base image layers
     default: empty-dir-volume
+  - name: VERSION
+    description: The jib-maven-plugin version
+    default: ""
 
   steps:
   - name: build-and-push
