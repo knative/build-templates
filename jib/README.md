@@ -23,6 +23,7 @@ kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/maste
 - **IMAGE**: The Docker image name to apply to the newly built image. (*required*)
 - **DIRECTORY**: The directory in the source repository where source should be found. (*default: .*)
 - **CACHE**: The name of the volume for caching Maven artifacts and base image layers (*default: empty-dir-volume*)
+- **VERSION**: The version of `jib-maven-plugin` to use (*default: from `pom.xml` or latest*)
 
 ## ServiceAccount
 
@@ -118,7 +119,7 @@ This assumes the source repo is using the Gradle plugin, configured in
 
 ```groovy
 plugins {
-  id 'com.google.cloud.tools.jib' version '0.9.10'
+  id 'com.google.cloud.tools.jib' version '0.10.0'
 }
 ```
 
