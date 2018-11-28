@@ -27,8 +27,8 @@ source $(dirname $0)/../vendor/github.com/knative/test-infra/scripts/e2e-tests.s
 
 # Helper functions.
 
-function run_buildpack_test() {
-  subheader "Running buildpack test"
+function run_namespace_buildpack_test() {
+  subheader "Running namespace buildpack test"
   echo "Installing template:"
   kubectl apply -f buildpack/buildpack.yaml || return 1
   echo "Checking that template is installed:"
@@ -38,13 +38,32 @@ function run_buildpack_test() {
   # Wait 5s for processing to start
   sleep 5
   echo "Checking that build was started:"
-  kubectl get build buildpack-build -oyaml
+  kubectl get build buildpack-build -o yaml
   # TODO(adrcunha): Add proper verification.
+  kubectl delete -f buildpack/buildpack.yaml || return 1
+  echo "Cleaning up"
+}
+
+function run_cluster_buildpack_test() {
+  subheader "Running cluster buildpack test"
+  echo "Installing template:"
+  kubectl apply -f buildpack/buildpack-cluster.yaml || return 1
+  echo "Checking that template is installed:"
+  kubectl get clusterbuildtemplates || return 1
+  echo "Creating build:"
+  kubectl apply -f test/build-buildpack.yaml || return 1
+  # Wait 5s for processing to start
+  sleep 5
+  echo "Checking that build was started:"
+  kubectl get build buildpack-build -o yaml
+  # TODO(adrcunha): Add proper verification.
+  echo "Cleaning up"
+  kubectl delete -f buildpack/buildpack-cluster.yaml || return 1
 }
 
 # Script entry point.
 
-initialize $@
+initialize "$@"
 
 # Install Knative Build if not using an existing cluster
 if (( ! USING_EXISTING_CLUSTER )); then
@@ -54,6 +73,7 @@ fi
 header "Running tests"
 
 # TODO(adrcunha): Add more tests.
-run_buildpack_test || fail_test
+run_namespace_buildpack_test || fail_test
+run_cluster_buildpack_test   || fail_test
 
 success
