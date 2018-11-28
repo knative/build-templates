@@ -1,7 +1,7 @@
 apiVersion: build.knative.dev/v1alpha1
 kind: Build
 metadata:
-  name: buildpack-build
+  name: buildpack-build-cluster
 spec:
   source:
     git:
@@ -9,7 +9,7 @@ spec:
       revision: v1.0
   template:
     name: buildpack
-    kind: BuildTemplate
+    kind: ClusterBuildTemplate
     arguments:
     - name: IMAGE
       value: us.gcr.io/my-project/my-app

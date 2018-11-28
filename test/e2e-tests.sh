@@ -40,8 +40,9 @@ function run_namespace_buildpack_test() {
   echo "Checking that build was started:"
   kubectl get build buildpack-build -o yaml
   # TODO(adrcunha): Add proper verification.
-  kubectl delete -f buildpack/buildpack.yaml || return 1
   echo "Cleaning up"
+  kubectl delete -f test/build-buildpack.yaml || return 1
+  kubectl delete -f buildpack/buildpack.yaml || return 1
 }
 
 function run_cluster_buildpack_test() {
@@ -51,13 +52,14 @@ function run_cluster_buildpack_test() {
   echo "Checking that template is installed:"
   kubectl get clusterbuildtemplates || return 1
   echo "Creating build:"
-  kubectl apply -f test/build-buildpack.yaml || return 1
+  kubectl apply -f test/build-buildpack-cluster.yaml || return 1
   # Wait 5s for processing to start
   sleep 5
   echo "Checking that build was started:"
-  kubectl get build buildpack-build -o yaml
+  kubectl get build buildpack-build-cluster -o yaml
   # TODO(adrcunha): Add proper verification.
   echo "Cleaning up"
+  kubectl delete -f test/build-buildpack-cluster.yaml || return 1
   kubectl delete -f buildpack/buildpack-cluster.yaml || return 1
 }
 
