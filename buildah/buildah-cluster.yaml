@@ -1,0 +1,35 @@
+apiVersion: build.knative.dev/v1alpha1
+kind: ClusterBuildTemplate
+metadata:
+  name: buildah
+spec:
+  parameters:
+  - name: BUILDER_IMAGE
+    description: The location of the buildah builder image.
+  - name: IMAGE
+    description: The name of the image to push.
+  - name: DOCKERFILE
+    description: Path to the Dockerfile to build.
+    default: ./Dockerfile
+  - name: TLSVERIFY
+    description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)
+    default: "true"
+
+  steps:
+  - name: build
+    image: ${BUILDER_IMAGE}
+    args: ['bud', '--tls-verify=${TLSVERIFY}', '--layers', '-f', '${DOCKERFILE}', '-t', '${IMAGE}', '.']
+    volumeMounts:
+    - name: varlibcontainers
+      mountPath: /var/lib/containers
+
+  - name: push
+    image: ${BUILDER_IMAGE}
+    args: ['push', '--tls-verify=${TLSVERIFY}', '${IMAGE}', 'docker://${IMAGE}']
+    volumeMounts:
+    - name: varlibcontainers
+      mountPath: /var/lib/containers
+
+  volumes:
+  - name: varlibcontainers
+    emptyDir: {}

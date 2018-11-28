@@ -1,0 +1,34 @@
+apiVersion: build.knative.dev/v1alpha1
+kind: ClusterBuildTemplate
+metadata:
+  name: jib-gradle
+spec:
+  parameters:
+  - name: IMAGE
+    description: The name of the image to push
+  - name: DIRECTORY
+    description: The directory containing the app, relative to the source repository root
+    default: .
+  - name: CACHE
+    description: The name of the volume for caching Maven artifacts and base image layers
+    default: empty-dir-volume
+
+  steps:
+  - name: build-and-push
+    image: gcr.io/cloud-builders/gradle
+    args:
+    - jib
+    - -Duser.home=/builder/home
+    - --image=${IMAGE}
+    workingDir: /workspace/${DIRECTORY}
+    volumeMounts:
+    - name: ${CACHE}
+      mountPath: /builder/home/.m2
+      subPath: m2-cache
+    - name: ${CACHE}
+      mountPath: /builder/home/.cache
+      subPath: jib-cache
+
+  volumes:
+  - name: empty-dir-volume
+    emptyDir: {}

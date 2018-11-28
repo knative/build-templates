@@ -1,0 +1,13 @@
+apiVersion: build.knative.dev/v1alpha1
+kind: ClusterBuildTemplate
+metadata:
+  name: bazel
+spec:
+  parameters:
+  - name: TARGET
+    description: The name of the Bazel "container_push" target to run
+
+  steps:
+  - name: build-and-push
+    image: gcr.io/cloud-builders/bazel
+    args: ['run', '${TARGET}']

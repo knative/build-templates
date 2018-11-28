@@ -1,0 +1,33 @@
+apiVersion: build.knative.dev/v1alpha1
+kind: ClusterBuildTemplate
+metadata:
+  name: buildkit
+spec:
+  parameters:
+  - name: IMAGE
+    description: Where to publish the resulting image
+  - name: DOCKERFILE
+    description: The name of the Dockerfile
+    default: "Dockerfile"
+  - name: PUSH
+    description: Whether push or not
+    default: "true"
+  - name: DIRECTORY
+    description: The directory containing the app
+    default: "/workspace"
+  - name: BUILDKIT_CLIENT_IMAGE
+    description: The name of the BuildKit client (buildctl) image
+    default: "moby/buildkit:v0.3.1-rootless@sha256:2407cc7f24e154a7b699979c7ced886805cac67920169dcebcca9166493ee2b6"
+  - name: BUILDKIT_DAEMON_ADDRESS
+    description: The address of the BuildKit daemon (buildkitd) service
+    default: "tcp://buildkitd:1234"
+  steps:
+  - name: build-and-push
+    image: ${BUILDKIT_CLIENT_IMAGE}
+    workingDir: ${DIRECTORY}
+    command: ["buildctl", "--addr=${BUILDKIT_DAEMON_ADDRESS}", "build",
+              "--progress=plain",
+              "--frontend=dockerfile.v0",
+              "--frontend-opt", "filename=${DOCKERFILE}",
+              "--local", "context=.", "--local", "dockerfile=.",
+              "--exporter=image", "--exporter-opt", "name=${IMAGE}", "--exporter-opt", "push=${PUSH}"]
