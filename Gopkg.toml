@@ -2,9 +2,14 @@
 # for detailed Gopkg.toml documentation.
 
 required = [
-  "github.com/knative/test-infra",
+  "github.com/knative/test-infra/scripts",
 ]
 
+[prune]
+   go-tests = true
+   unused-packages = true
+   non-go = true
 
 [[prune.project]]
   name = "github.com/knative/test-infra"
+  non-go = false
