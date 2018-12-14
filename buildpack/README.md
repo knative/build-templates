@@ -27,6 +27,8 @@ kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/maste
     should be found. (_default:_ `/workspace`)
 * **CACHE:** The directory where data should be persistently cached
     between builds. (_default:_ `app-cache`)
+* **USE_CRED_HELPERS:** Use Docker credential helpers for Google's GCR, Amazon's
+    ECR, or Microsoft's ACR. (_default:_ `"true"`)
 
 ## Usage
 

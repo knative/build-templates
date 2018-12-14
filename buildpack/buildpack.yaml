@@ -18,6 +18,9 @@ spec:
   - name: CACHE
     description: The name of the persistent app cache volume
     default: app-cache
+  - name: USE_CRED_HELPERS
+    description: Use Docker credential helpers for Google's GCR, Amazon's ECR, or Microsoft's ACR.
+    default: "true"
 
   steps:
   # In: a CF app in $DIRECTORY
@@ -39,6 +42,9 @@ spec:
     image: packs/cf:export
     workingDir: /in
     args: ["${IMAGE}"]
+    env:
+    - name: PACK_USE_HELPERS
+      value: "${USE_CRED_HELPERS}"
     volumeMounts:
     - name: droplet
       mountPath: /in
