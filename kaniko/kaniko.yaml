@@ -12,10 +12,10 @@ spec:
 
   steps:
   - name: build-and-push
-    # Newer versions of kaniko expect credentials outside of ~/.docker/config
-    # Pin to v0.1.0 until
-    # https://github.com/GoogleContainerTools/kaniko/issues/392 is resolved
-    image: gcr.io/kaniko-project/executor:v0.1.0
+    image: gcr.io/kaniko-project/executor
     args:
     - --dockerfile=${DOCKERFILE}
     - --destination=${IMAGE}
+    env:
+    - name: DOCKER_CONFIG
+      value: /builder/home/.docker
