@@ -92,6 +92,7 @@ IFS=:
 set -- $TOKEN
 USERNAME=$1
 PASSWORD=$2
+unset IFS
 
 if [[ -z $USERNAME ]]; then
     echo "got empty username"
