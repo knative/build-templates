@@ -35,6 +35,14 @@ RUN \
   git checkout "${BUILDAH_REVISION}" && \
   make && \
   make install && \
+  yum clean all && \
+  rm -rf \
+      /var/cache/yum \
+      /usr/share/doc \
+      /usr/share/man \
+     /usr/share/info \
+     /usr/share/locale \
+     /var/log/* \
   buildah --help
 
 ENV BUILDAH_ISOLATION chroot
