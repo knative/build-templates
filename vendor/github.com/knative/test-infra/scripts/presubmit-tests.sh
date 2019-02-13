@@ -19,6 +19,10 @@
 
 source $(dirname ${BASH_SOURCE})/library.sh
 
+# Custom configuration of presubmit tests
+readonly DISABLE_MD_LINTING=${DISABLE_MD_LINTING:-0}
+readonly DISABLE_MD_LINK_CHECK=${DISABLE_MD_LINK_CHECK:-0}
+
 # Extensions or file patterns that don't require presubmit tests.
 readonly NO_PRESUBMIT_FILES=(\.png \.gitignore \.gitattributes ^OWNERS ^OWNERS_ALIASES ^AUTHORS)
 
@@ -96,30 +100,48 @@ function run_build_tests() {
     fi
   fi
   # Don't run post-build tests if pre/build tests failed
-  if function_exists post_build_tests; then
+  if (( ! failed )) && function_exists post_build_tests; then
     post_build_tests || failed=1
   fi
   results_banner "Build" ${failed}
   return ${failed}
 }
 
-# Default build test runner that:
-# * lint and link check markdown files
-# * `go build` on the entire repo
-# * run `/hack/verify-codegen.sh` (if it exists)
-# * check licenses in `/cmd` (if it exists)
-function default_build_test_runner() {
+# Perform markdown build tests if necessary, unless disabled.
+function markdown_build_tests() {
+  (( DISABLE_MD_LINTING && DISABLE_MD_LINK_CHECK )) && return 0
+  # Get changed markdown files (ignore /vendor and deleted files)
+  local mdfiles=""
+  for file in $(echo "${CHANGED_FILES}" | grep \.md$ | grep -v ^vendor/); do
+    [[ -f "${file}" ]] && mdfiles="${mdfiles} ${file}"
+  done
+  [[ -z "${mdfiles}" ]] && return 0
   local failed=0
-  # Ignore markdown files in /vendor
-  local mdfiles="$(echo "${CHANGED_FILES}" | grep \.md$ | grep -v ^vendor/)"
-  if [[ -n "${mdfiles}" ]]; then
+  if (( ! DISABLE_MD_LINTING )); then
     subheader "Linting the markdown files"
     lint_markdown ${mdfiles} || failed=1
+  fi
+  if (( ! DISABLE_MD_LINK_CHECK )); then
     subheader "Checking links in the markdown files"
     check_links_in_markdown ${mdfiles} || failed=1
   fi
+  return ${failed}
+}
+
+# Default build test runner that:
+# * check markdown files
+# * `go build` on the entire repo
+# * run `/hack/verify-codegen.sh` (if it exists)
+# * check licenses in all go packages
+function default_build_test_runner() {
+  local failed=0
+  # Perform markdown build checks first
+  markdown_build_tests || failed=1
   # For documentation PRs, just check the md files
   (( IS_DOCUMENTATION_PR )) && return ${failed}
+  # Skip build test if there is no go code
+  local go_pkg_dirs="$(go list ./...)"
+  [[ -z "${go_pkg_dirs}" ]] && return ${failed}
   # Ensure all the code builds
   subheader "Checking that go code builds"
   go build -v ./... || failed=1
@@ -134,10 +156,8 @@ function default_build_test_runner() {
     ./hack/verify-codegen.sh || failed=1
   fi
   # Check that we don't have any forbidden licenses in our images.
-  if [[ -d ./cmd ]]; then
-    subheader "Checking for forbidden licenses"
-    check_licenses ./cmd/* || failed=1
-  fi
+  subheader "Checking for forbidden licenses"
+  check_licenses ${go_pkg_dirs} || failed=1
   return ${failed}
 }
 
@@ -160,7 +180,7 @@ function run_unit_tests() {
     fi
   fi
   # Don't run post-unit tests if pre/unit tests failed
-  if function_exists post_unit_tests; then
+  if (( ! failed )) && function_exists post_unit_tests; then
     post_unit_tests || failed=1
   fi
   results_banner "Unit" ${failed}
@@ -236,7 +256,7 @@ function main() {
     echo ">> gcloud SDK version"
     gcloud version
     echo ">> kubectl version"
-    kubectl version
+    kubectl version --client
     echo ">> go version"
     go version
     echo ">> git version"
