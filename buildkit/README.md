@@ -2,7 +2,7 @@
 
 This build template builds source into a container image using [Moby BuildKit](https://github.com/moby/buildkit).
 
-Rootless mode is used by default.
+[Rootless mode](https://github.com/moby/buildkit/blob/v0.3.1/docs/rootless.md) is used by default.
 
 ## Parameters
 
