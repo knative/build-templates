@@ -37,9 +37,15 @@ function run_buildpack_test() {
   kubectl apply -f test/build-buildpack.yaml || return 1
   # Wait 5s for processing to start
   sleep 5
-  echo "Checking that build was started:"
-  kubectl get build buildpack-build -oyaml
-  # TODO(adrcunha): Add proper verification.
+  echo "Checking that build was successed:"
+  for i in {1..100};do
+     kubectl get build buildpack-build -o 'jsonpath={.status.conditions[?(@.type=="Succeeded")].status}'  1>/dev/null 2>&1
+     if [ $? -ne 1 ]; then
+      break
+     fi
+     echo "The build was successed."
+     sleep 2
+  done
 }
 
 # Script entry point.
