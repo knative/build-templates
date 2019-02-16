@@ -47,7 +47,7 @@ RUN mkdir ~/buildah && \
 
 FROM centos:7
 RUN yum -y install libarchive ostree lzo libseccomp libedit gpgme && \
-  yam clean all && \
+  yum clean all && \
   rm -rf \
     /var/cache/yum \
     /usr/share/doc \
