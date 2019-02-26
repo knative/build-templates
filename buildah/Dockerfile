@@ -1,5 +1,6 @@
-FROM centos:7 as base
+FROM docker.io/centos:7 as base
 RUN \
+  yum -y install epel-release && \
   # Install buildah dependencies.
   yum -y install \
     make \
@@ -45,9 +46,9 @@ RUN mkdir ~/buildah && \
   make && \
   make install
 
-FROM centos:7
+FROM docker.io/centos:7
 RUN yum -y install libarchive ostree lzo libseccomp libedit gpgme && \
-  yam clean all && \
+  yum clean all && \
   rm -rf \
     /var/cache/yum \
     /usr/share/doc \
