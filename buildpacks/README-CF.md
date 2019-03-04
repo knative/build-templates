@@ -11,7 +11,7 @@ the resulting application image to a Docker registry under the provided name.
 ## Create the template
 
 ```
-kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/master/buildpack/buildpack.yaml
+kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/master/buildpacks/cf.yaml
 ```
 
 ## Parameters
@@ -43,7 +43,7 @@ spec:
       url: https://github.com/my-user/my-repo
       revision: master
   template:
-    name: buildpack
+    name: buildpacks-cloudfoundry
     arguments:
     - name: IMAGE
       value: us.gcr.io/my-project/my-app
