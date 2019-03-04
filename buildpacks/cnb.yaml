@@ -34,7 +34,8 @@ spec:
     - "-c"
     - >
       chown -R "${USER_ID}:${GROUP_ID}" "/builder/home" &&
-      chown -R "${USER_ID}:${GROUP_ID}" /layers
+      chown -R "${USER_ID}:${GROUP_ID}" /layers &&
+      chown -R "${USER_ID}:${GROUP_ID}" /workspace
     volumeMounts:
     - name: "${CACHE}"
       mountPath: /layers
