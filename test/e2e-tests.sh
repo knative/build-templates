@@ -54,7 +54,7 @@ function run_cloud_native_buildpacks_test() {
   # Wait 5s for processing to start
   sleep 5
   echo "Checking that build was started:"
-  kubectl get build cf-build -oyaml
+  kubectl get build cnb-build -oyaml
   # TODO(adrcunha): Add proper verification.
 }
 
