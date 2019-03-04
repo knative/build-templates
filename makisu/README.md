@@ -41,13 +41,17 @@ Write a `Build` manifest and use the `template` section to refer to the makisu
 build template. Set the value of the parameters such as the destination Docker
 image.
 
-```
+In this example, the Git repo being built is expected to have a `Dockerfile` at
+the root of the repository.
+
+### Docker Registry
+
+```yaml
 apiVersion: build.knative.dev/v1alpha1
 kind: Build
 metadata:
   name: makisu-build
 spec:
-  serviceAccountName: makisu-build
   source:
     git:
       url: https://github.com/my-user/my-repo
@@ -56,8 +60,30 @@ spec:
     name: makisu
     arguments:
     - name: IMAGE
-      value: us.gcr.io/my-project/my-app
+      value: my-project/my-app
 ```
 
-In this example, the Git repo being built is expected to have a `Dockerfile` at
-the root of the repository.
+### Other Registries
+
+**The PUSH_REGISTRY must match the name of the registry specified in the registry.yaml**
+
+```yaml
+apiVersion: build.knative.dev/v1alpha1
+kind: Build
+metadata:
+  name: makisu-build-gcr
+spec:
+  source:
+    git:
+      url: https://github.com/my-user/my-repo
+      revision: master
+  template:
+    name: makisu
+    arguments:
+    - name: IMAGE
+      value: eu.gcr.io/gke-on-premise-inovex
+    - name: PUSH_REGISTRY # must match the registry in the secret
+      value: eu.gcr.io
+    - name: REGISTRY_SECRET
+      value: gcr-registry-config
+```

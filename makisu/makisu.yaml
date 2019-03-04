@@ -12,16 +12,16 @@ spec:
   - name: PUSH_REGISTRY
     description: Registry to push image to.
     default: index.docker.io
-  # ToDo currently not possible see: https://github.com/knative/build/pull/550
   - name: REGISTRY_SECRET
     description: Secret containing information about the used regsitry.
     default: docker-registry-config
   steps:
   - name: build-and-push
-    image: gcr.io/makisu-project/makisu:v0.1.8
+    image: gcr.io/makisu-project/makisu:v0.1.9
     args:
       - build
-      - --push=${PUSHREGISTRY}
+      - --push=${PUSH_REGISTRY}
+      - --registry-config=/registry-config
       - --modifyfs=true
       - --tag=${IMAGE}
       - --registry-config=/registry-config/registry.yaml
@@ -35,5 +35,4 @@ spec:
   volumes:
   - name: registry-config
     secret:
-      # ToDo currently not possible ${REGISTRY_SECRET}
-      secretName: docker-registry-config
+      secretName: ${REGISTRY_SECRET}
