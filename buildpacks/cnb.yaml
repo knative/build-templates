@@ -34,9 +34,7 @@ spec:
     - "-c"
     - >
       chown -R "${USER_ID}:${GROUP_ID}" "/builder/home" &&
-      chown -R "${USER_ID}:${GROUP_ID}" /layers &&
-      ls -al /builder/home &&
-      ls -al /builder/home/.docker
+      chown -R "${USER_ID}:${GROUP_ID}" /layers
     volumeMounts:
     - name: "${CACHE}"
       mountPath: /layers
@@ -46,14 +44,20 @@ spec:
     command: ["/lifecycle/detector"]
     args:
     - "-app=/workspace"
+    - "-group=/layers/group.toml"
+    - "-plan=/layers/plan.toml"
+    volumeMounts:
+    - name: "${CACHE}"
+      mountPath: /layers
     imagePullPolicy: Always
   - name: analyze
     image: ${BUILDER_IMAGE}
     command: ["/lifecycle/analyzer"]
     args:
-     - "-layers=/layers"
-     - "-helpers=${USE_CRED_HELPERS}"
-     - "${IMAGE}"
+    - "-layers=/layers"
+    - "-helpers=${USE_CRED_HELPERS}"
+    - "-group=/layers/group.toml"
+    - "${IMAGE}"
     volumeMounts:
     - name: "${CACHE}"
       mountPath: /layers
@@ -62,8 +66,10 @@ spec:
     image: ${BUILDER_IMAGE}
     command: ["/lifecycle/builder"]
     args:
-     - "-layers=/layers"
-     - "-app=/workspace"
+    - "-layers=/layers"
+    - "-app=/workspace"
+    - "-group=/layers/group.toml"
+    - "-plan=/layers/plan.toml"
     volumeMounts:
     - name: "${CACHE}"
       mountPath: /layers
@@ -72,11 +78,12 @@ spec:
     image: ${BUILDER_IMAGE}
     command: ["/lifecycle/exporter"]
     args:
-     - "-layers=/layers"
-     - "-helpers=${USE_CRED_HELPERS}"
-     - "-app=/workspace"
-     - "-image=${RUN_IMAGE}"
-     - "${IMAGE}"
+    - "-layers=/layers"
+    - "-helpers=${USE_CRED_HELPERS}"
+    - "-app=/workspace"
+    - "-image=${RUN_IMAGE}"
+    - "-group=/layers/group.toml"
+    - "${IMAGE}"
     volumeMounts:
     - name: "${CACHE}"
       mountPath: /layers
