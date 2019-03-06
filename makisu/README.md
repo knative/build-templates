@@ -65,7 +65,7 @@ spec:
 
 ### Other Registries
 
-**The PUSH_REGISTRY must match the name of the registry specified in the registry.yaml**
+The `PUSH_REGISTRY` **must** match the name of the registry specified in the registry.yaml
 
 ```yaml
 apiVersion: build.knative.dev/v1alpha1
