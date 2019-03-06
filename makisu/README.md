@@ -33,7 +33,7 @@ kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/maste
 * **PUSH_REGISTRY**: The Registry to push the image to (_default:_
   `index.docker.io`)
 * **REGISTRY_SECRET**: Secret containing information about the used regsitry (_default:_
-  `docker-registry-config`) **This Parameter currently doesn't work: https://github.com/knative/build/pull/550**
+  `docker-registry-config`)
 
 ## Usage
 
