@@ -27,18 +27,34 @@ source $(dirname $0)/../vendor/github.com/knative/test-infra/scripts/e2e-tests.s
 
 # Helper functions.
 
-function run_buildpack_test() {
-  subheader "Running buildpack test"
+function run_cloudfoundry_buildpacks_test() {
+  subheader "Running cloudfoundry test"
   echo "Installing template:"
-  kubectl apply -f buildpack/buildpack.yaml || return 1
+  kubectl apply -f buildpacks/cf.yaml || return 1
   echo "Checking that template is installed:"
   kubectl get buildtemplates || return 1
   echo "Creating build:"
-  kubectl apply -f test/build-buildpack.yaml || return 1
+  kubectl apply -f test/build-cf.yaml || return 1
   # Wait 5s for processing to start
   sleep 5
   echo "Checking that build was started:"
-  kubectl get build buildpack-build -oyaml
+  kubectl get build cf-build -oyaml
+  # TODO(adrcunha): Add proper verification.
+}
+
+
+function run_cloud_native_buildpacks_test() {
+  subheader "Running cloud native buildpacks test"
+  echo "Installing template:"
+  kubectl apply -f buildpacks/cnb.yaml || return 1
+  echo "Checking that template is installed:"
+  kubectl get buildtemplates || return 1
+  echo "Creating build:"
+  kubectl apply -f test/build-cnb.yaml || return 1
+  # Wait 5s for processing to start
+  sleep 5
+  echo "Checking that build was started:"
+  kubectl get build cnb-build -oyaml
   # TODO(adrcunha): Add proper verification.
 }
 
@@ -54,6 +70,7 @@ fi
 header "Running tests"
 
 # TODO(adrcunha): Add more tests.
-run_buildpack_test || fail_test
+run_cloudfoundry_buildpacks_test || fail_test
+run_cloud_native_buildpacks_test || fail_test
 
 success

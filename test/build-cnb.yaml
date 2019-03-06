@@ -1,0 +1,14 @@
+apiVersion: build.knative.dev/v1alpha1
+kind: Build
+metadata:
+  name: cnb-build
+spec:
+  source:
+    git:
+      url: https://github.com/my-user/my-repo
+      revision: v1.0
+  template:
+    name: buildpacks-cnb
+    arguments:
+    - name: IMAGE
+      value: us.gcr.io/my-project/my-app
