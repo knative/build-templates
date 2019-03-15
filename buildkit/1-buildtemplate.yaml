@@ -17,7 +17,7 @@ spec:
     default: "/workspace"
   - name: BUILDKIT_CLIENT_IMAGE
     description: The name of the BuildKit client (buildctl) image
-    default: "moby/buildkit:v0.3.1-rootless@sha256:2407cc7f24e154a7b699979c7ced886805cac67920169dcebcca9166493ee2b6"
+    default: "moby/buildkit:v0.4.0-rootless@sha256:3877d091e65429f59919ed5591aaeb863b1889a5314bdfdba5ff9c0dfb2f3ed0"
   - name: BUILDKIT_DAEMON_ADDRESS
     description: The address of the BuildKit daemon (buildkitd) service
     default: "tcp://buildkitd:1234"
@@ -28,6 +28,11 @@ spec:
     command: ["buildctl", "--addr=${BUILDKIT_DAEMON_ADDRESS}", "build",
               "--progress=plain",
               "--frontend=dockerfile.v0",
-              "--frontend-opt", "filename=${DOCKERFILE}",
+              "--opt", "filename=${DOCKERFILE}",
               "--local", "context=.", "--local", "dockerfile=.",
-              "--exporter=image", "--exporter-opt", "name=${IMAGE}", "--exporter-opt", "push=${PUSH}"]
+              "--output", "type=image,name=${IMAGE},push=${PUSH}"]
+#
+# To enable distributed cache, add
+#   --export-cache type=inline --import-cache type=registry,ref=${IMAGE}
+# or
+#   --export-cache type=local,dest=/your/nfs/volume --import-cache type=local,src=/your/nfs/volume
