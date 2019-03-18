@@ -1,0 +1,47 @@
+apiVersion: build.knative.dev/v1alpha1
+kind: BuildTemplate
+metadata:
+  name: s2i
+spec:
+  parameters:
+  - name: S2I_BUILDER_IMAGE
+    description: The location of the s2i builder image.
+  - name: BUILDAH_BUILDER_IMAGE
+    description: The location of the buildah builder image.
+  - name: IMAGE
+    description: The name of the image to push.
+  - name: BASE_IMAGE
+    description: The base image to use with `s2i` to build from.
+  - name: TLSVERIFY
+    description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)
+    default: "true"
+
+  steps:
+  - name: generate
+    image: ${S2I_BUILDER_IMAGE}
+    args: ['/workspace', '${BASE_IMAGE}', '${IMAGE}']
+    workingDir: /sources
+    volumeMounts:
+    - name: generatedsources
+      mountPath: /sources
+  - name: build
+    image: ${BUILDAH_BUILDER_IMAGE}
+    args: ['bud', '--tls-verify=${TLSVERIFY}', '--layers', '-f', 'Dockerfile', '-t', '${IMAGE}', '.']
+    workingDir: /sources
+    volumeMounts:
+    - name: generatedsources
+      mountPath: /sources
+    - name: varlibcontainers
+      mountPath: /var/lib/containers
+  - name: push
+    image: ${BUILDAH_BUILDER_IMAGE}
+    args: ['push', '--tls-verify=${TLSVERIFY}', '${IMAGE}', 'docker://${IMAGE}']
+    volumeMounts:
+    - name: varlibcontainers
+      mountPath: /var/lib/containers
+
+  volumes:
+  - name: varlibcontainers
+    emptyDir: {}
+  - name: generatedsources
+    emptyDir: {}
