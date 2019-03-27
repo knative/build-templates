@@ -14,6 +14,17 @@ spec:
     default: empty-dir-volume
 
   steps:
+  - name: docker-creds-helper
+    image: golang:1.11.4
+    command: ["/bin/bash"]
+    args:
+    - -c
+    - |
+      go get github.com/GoogleCloudPlatform/docker-credential-gcr;
+      cp /go/bin/docker-credential-gcr /usr/local/bin;
+    volumeMounts:
+    - name: ${CACHE}
+      mountPath: /usr/local/bin
   - name: build-and-push
     image: gcr.io/cloud-builders/mvn
     args:
@@ -23,6 +34,8 @@ spec:
     - -Dimage=${IMAGE}
     workingDir: /workspace/${DIRECTORY}
     volumeMounts:
+    - name: ${CACHE}
+      mountPath: /usr/local/bin
     - name: ${CACHE}
       mountPath: /builder/home/.m2
       subPath: m2-cache
