@@ -58,14 +58,17 @@ function run_cloud_native_buildpacks_test() {
   # TODO(adrcunha): Add proper verification.
 }
 
+function knative_setup() {
+  header "Starting Knative Build"
+  subheader "Installing Knative Build"
+  echo "Installing Build from ${KNATIVE_BUILD_RELEASE}"
+  kubectl apply -f ${KNATIVE_BUILD_RELEASE} || return 1
+  wait_until_pods_running knative-build || return 1
+}
+
 # Script entry point.
 
 initialize $@
-
-# Install Knative Build if not using an existing cluster
-if (( ! USING_EXISTING_CLUSTER )); then
-  start_latest_knative_build || fail_test
-fi
 
 header "Running tests"
 

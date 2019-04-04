@@ -22,6 +22,7 @@ source $(dirname ${BASH_SOURCE})/library.sh
 # Custom configuration of presubmit tests
 readonly DISABLE_MD_LINTING=${DISABLE_MD_LINTING:-0}
 readonly DISABLE_MD_LINK_CHECK=${DISABLE_MD_LINK_CHECK:-0}
+readonly PRESUBMIT_TEST_FAIL_FAST=${PRESUBMIT_TEST_FAIL_FAST:-0}
 
 # Extensions or file patterns that don't require presubmit tests.
 readonly NO_PRESUBMIT_FILES=(\.png \.gitignore \.gitattributes ^OWNERS ^OWNERS_ALIASES ^AUTHORS)
@@ -311,12 +312,20 @@ function main() {
     if (( RUN_BUILD_TESTS || RUN_UNIT_TESTS || RUN_INTEGRATION_TESTS )); then
       abort "--run-test must be used alone"
     fi
+    # If this is a presubmit run, but a documentation-only PR, don't run the test
+    (( IS_PRESUBMIT && IS_DOCUMENTATION_PR )) && exit 0
     ${TEST_TO_RUN} || failed=1
   fi
 
   run_build_tests || failed=1
-  run_unit_tests || failed=1
-  run_integration_tests || failed=1
+  # If PRESUBMIT_TEST_FAIL_FAST is set to true, don't run unit tests if build tests failed
+  if (( ! PRESUBMIT_TEST_FAIL_FAST )) || (( ! failed )); then
+    run_unit_tests || failed=1
+  fi
+  # If PRESUBMIT_TEST_FAIL_FAST is set to true, don't run integration tests if build/unit tests failed
+  if (( ! PRESUBMIT_TEST_FAIL_FAST )) || (( ! failed )); then
+    run_integration_tests || failed=1
+  fi
 
   exit ${failed}
 }
