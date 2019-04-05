@@ -150,6 +150,10 @@ function create_test_cluster() {
   set -o errexit
   set -o pipefail
 
+  if function_exists cluster_setup; then
+    cluster_setup || fail_test "cluster setup failed"
+  fi
+
   header "Creating test cluster"
 
   echo "Cluster will have a minimum of ${E2E_MIN_CLUSTER_NODES} and a maximum of ${E2E_MAX_CLUSTER_NODES} nodes."
@@ -209,6 +213,7 @@ function create_test_cluster() {
   echo "Test subprocess exited with code $?"
   # Ignore any errors below, this is a best-effort cleanup and shouldn't affect the test result.
   set +o errexit
+  function_exists cluster_teardown && cluster_teardown
   delete_leaked_network_resources
   local result="$(cat ${TEST_RESULT_FILE})"
   echo "Artifacts were written to ${ARTIFACTS}"
