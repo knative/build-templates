@@ -53,6 +53,11 @@ checkBinary aws
 checkBinary jq
 checkBinary kubectl
 
+if [[ "$1" == "--push-and-pull" ]]; then
+  PUSH_AND_PULL_SECRETS=true
+  shift
+fi
+
 readonly KUBECTL_FLAGS="${1:+ -n $1}"
 
 if ! kubectl $KUBECTL_FLAGS get sa >& /dev/null; then
@@ -104,6 +109,25 @@ if [[ -z $PASSWORD ]]; then
     exit 1
 fi
 
+if [[ -n "$PUSH_AND_PULL_SECRETS" ]]; then
+  OPTIONAL_IMAGE_PULL_SECRETS=$(cat <<EOF
+imagePullSecrets:
+- name: ecr-creds-pull
+EOF
+)
+  OPTIONAL_PULL_SECRET=$(cat <<EOF
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ecr-creds-pull
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: $(echo -n "{\"auths\":{\"$ENDPOINT\":{\"Username\":\"$USERNAME\",\"Password\":\"$PASSWORD\",\"Email\":\"noop\"}}}" | openssl base64 -a -A)
+EOF
+)
+fi
+
 cat <<EOF | kubectl $KUBECTL_FLAGS apply -f - 2>&3
 apiVersion: v1
 kind: ServiceAccount
@@ -111,6 +135,7 @@ metadata:
   name: $KUBE_SA
 secrets:
 - name: ecr-creds
+$OPTIONAL_IMAGE_PULL_SECRETS
 ---
 apiVersion: v1
 kind: Secret
@@ -122,6 +147,7 @@ type: kubernetes.io/basic-auth
 data:
   username: $(echo -n $USERNAME | openssl base64 -a -A)
   password: $(echo -n $PASSWORD | openssl base64 -a -A)
+$OPTIONAL_PULL_SECRET
 EOF
 
 readonly EXIT=$?

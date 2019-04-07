@@ -6,7 +6,6 @@ By default, the following resources will be provisioned:
 
 * A Kubernetes service account (named `builder` by default) with secrets (`ecr-creds`) to enable pushing to ECR.
 
-
 To use, simply add a `serviceAccountName: builder` entry to your build definition
 
 ```yaml:
@@ -35,6 +34,12 @@ the namespace and kubernetes service account used:
 
 ```shell
 ecr_helper/helper.sh $MY_NAMESPACE builder-serviceaccount
+```
+
+Optionally, a pull secret can be added to the service account which enables pulling images from a private ECR.
+
+```shell
+ecr_helper/helper.sh --push-and-pull <namespace> <serviceaccount>
 ```
 
 This will output a log of operations performed or skipped:
