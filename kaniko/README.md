@@ -24,6 +24,8 @@ kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/maste
   (_required_)
 * **DOCKERFILE**: The path to the `Dockerfile` to execute (_default:_
   `./Dockerfile`)
+* **CONTEXT**: Kaniko [build context](https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
+  (_default:_  `/workspace`)
 
 ## ServiceAccount
 
@@ -60,7 +62,11 @@ spec:
     arguments:
     - name: IMAGE
       value: us.gcr.io/my-project/my-app
+    - name: DOCKERFILE
+      value: ./Dockerfile
+    - name: CONTEXT
+      value: /workspace/myfolder
 ```
 
-In this example, the Git repo being built is expected to have a `Dockerfile` at
-the root of the repository.
+In this example, the Git repo being built is expected to have a `Dockerfile` below
+`myfolder` relative root of the repository.

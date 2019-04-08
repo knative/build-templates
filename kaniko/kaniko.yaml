@@ -9,6 +9,9 @@ spec:
   - name: DOCKERFILE
     description: Path to the Dockerfile to build.
     default: /workspace/Dockerfile
+  - name: CONTEXT
+    description: Build Context
+    default: /workspace
 
   steps:
   - name: build-and-push
@@ -16,6 +19,7 @@ spec:
     args:
     - --dockerfile=${DOCKERFILE}
     - --destination=${IMAGE}
+    - --context=${CONTEXT}
     env:
     - name: DOCKER_CONFIG
       value: /builder/home/.docker
