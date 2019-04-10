@@ -18,7 +18,6 @@ RUN \
 
 FROM base as runc
 ARG RUNC_REVISION="master"
-
 RUN yum -y install runc
 RUN mkdir ~/runc && \
   cd ~/runc && \
@@ -48,6 +47,7 @@ RUN mkdir ~/buildah && \
 
 FROM docker.io/centos:7
 RUN yum -y install libarchive ostree lzo libseccomp libedit gpgme && \
+  yum update -y && \
   yum clean all && \
   rm -rf \
     /var/cache/yum \
