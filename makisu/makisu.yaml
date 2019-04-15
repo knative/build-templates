@@ -13,7 +13,7 @@ spec:
     description: Registry to push image to.
     default: index.docker.io
   - name: REGISTRY_SECRET
-    description: Secret containing information about the used regsitry.
+    description: Secret containing information about the used registry.
     default: docker-registry-config
   steps:
   - name: build-and-push
