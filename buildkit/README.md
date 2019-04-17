@@ -22,15 +22,15 @@ Rootless mode is used by default.
 First, you need to deploy BuildKit daemon as follows:
 
 ```console
-$ kubectl apply -f 0-buildkitd.yaml
+kubectl apply -f 0-buildkitd.yaml
 ```
 
 The default image is set to `moby/buildkit:vX.Y.Z-rootless@sha256:...` (see YAML files for the actual revision), but you can also build the image manually as follows:
 
 ```console
-$ git clone https://github.com/moby/buildkit.git
-$ cd buildkit
-$ DOCKER_BUILDKIT=1 docker build --target rootless -f hack/dockerfiles/test.buildkit.Dockerfile .
+git clone https://github.com/moby/buildkit.git
+cd buildkit
+DOCKER_BUILDKIT=1 docker build --target rootless -f hack/dockerfiles/test.buildkit.Dockerfile .
 ```
 
 If you are using Debian (not Ubuntu) or Arch Linux kernel on each of kubelet nodes, `sudo sh -c "echo 1 > /proc/sys/kernel/unprivileged_userns_clone"` is required.
@@ -41,7 +41,7 @@ You can also use "rootful" BuildKit image (`moby/buildkit:vX.Y.Z`) at your own r
 ### Step 1: Register BuildKit build template
 
 ```console
-$ kubectl apply -f 1-buildtemplate.yaml
+kubectl apply -f 1-buildtemplate.yaml
 ```
 
 ## Usage
