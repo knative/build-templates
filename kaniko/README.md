@@ -34,7 +34,7 @@ needs to have the proper credentials. This is achieved using a build
 
 For an example on how to create such a `ServiceAccount` to push an image to
 Docker hub, see the
-[Authentication](https://github.com/knative/docs/blob/master/build/auth.md#basic-authentication-docker)
+[Authentication](https://github.com/knative/docs/blob/master/docs/build/auth.md#basic-authentication-docker)
 documentation page.
 
 ## Usage
