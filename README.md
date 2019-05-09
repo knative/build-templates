@@ -10,7 +10,7 @@ Each build template is in a separate directory along with a README.md and a Kube
 There are two kinds of build templates:
 
  1. `ClusterBuildTemplates` with a Cluster scope
- 2. `BuildTemplates` with a Namespace scope
+ 1. `BuildTemplates` with a Namespace scope
 
  A default kind of `BuildTemplate` is used if the field `kind` is not set.
 
@@ -31,7 +31,7 @@ NAME       AGE
 buildpack  3s
 ```
 
-*OR*
+OR
 
 ```
 $ kubectl get clusterbuildtemplates
@@ -70,7 +70,7 @@ build "buildpack-build" created
 You can check the status of the build using `kubectl`:
 
 ```
-$ kubectl get build buildpack-build -oyaml
+kubectl get build buildpack-build -o yaml
 ```
 
 ## Contributing and Support
