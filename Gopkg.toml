@@ -2,7 +2,7 @@
 # for detailed Gopkg.toml documentation.
 
 required = [
-  "github.com/knative/test-infra/scripts",
+  "knative.dev/test-infra/scripts",
 ]
 
 [prune]
@@ -11,5 +11,5 @@ required = [
    non-go = true
 
 [[prune.project]]
-  name = "github.com/knative/test-infra"
+  name = "knative.dev/test-infra"
   non-go = false
