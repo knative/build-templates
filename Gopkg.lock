@@ -3,15 +3,15 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:86f0655bf97d281d301dd66ee56fff523b0c48873c5b7daae462012140043585"
-  name = "github.com/knative/test-infra"
+  digest = "1:28ab14d6b5cbebc76f615694f1381dc04f530ffa1fda3f5148059adc90667bfd"
+  name = "knative.dev/test-infra"
   packages = ["scripts"]
   pruneopts = "UT"
-  revision = "e83cf0ab6b1d7ea37ff65d279f745284ae0c77b2"
+  revision = "17f2331e80ad0d3e170ea2bae45c3922744f83af"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = ["github.com/knative/test-infra/scripts"]
+  input-imports = ["knative.dev/test-infra/scripts"]
   solver-name = "gps-cdcl"
   solver-version = 1

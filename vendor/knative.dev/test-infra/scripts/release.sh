@@ -19,12 +19,15 @@
 
 source $(dirname ${BASH_SOURCE})/library.sh
 
+# Organization name in GitHub; defaults to Knative.
+readonly ORG_NAME="${ORG_NAME:-knative}"
+
 # GitHub upstream.
-readonly KNATIVE_UPSTREAM="https://github.com/knative/${REPO_NAME}"
+readonly REPO_UPSTREAM="https://github.com/${ORG_NAME}/${REPO_NAME}"
 
 # GCRs for Knative releases.
-readonly NIGHTLY_GCR="gcr.io/knative-nightly/github.com/knative/${REPO_NAME}"
-readonly RELEASE_GCR="gcr.io/knative-releases/github.com/knative/${REPO_NAME}"
+readonly NIGHTLY_GCR="gcr.io/knative-nightly/github.com/${ORG_NAME}/${REPO_NAME}"
+readonly RELEASE_GCR="gcr.io/knative-releases/github.com/${ORG_NAME}/${REPO_NAME}"
 
 # Georeplicate images to {us,eu,asia}.gcr.io
 readonly GEO_REPLICATION=(us eu asia)
@@ -82,17 +85,21 @@ TAG_RELEASE=0
 PUBLISH_RELEASE=0
 PUBLISH_TO_GITHUB=0
 TAG=""
+BUILD_COMMIT_HASH=""
+BUILD_YYYYMMDD=""
+BUILD_TIMESTAMP=""
+BUILD_TAG=""
 RELEASE_VERSION=""
 RELEASE_NOTES=""
 RELEASE_BRANCH=""
-RELEASE_GCS_BUCKET=""
-KO_FLAGS=""
+RELEASE_GCS_BUCKET="knative-nightly/${REPO_NAME}"
+KO_FLAGS="-P"
 VALIDATION_TESTS="./test/presubmit-tests.sh"
 YAMLS_TO_PUBLISH=""
 ARTIFACTS_TO_PUBLISH=""
 FROM_NIGHTLY_RELEASE=""
 FROM_NIGHTLY_RELEASE_GCS=""
-export KO_DOCKER_REPO=""
+export KO_DOCKER_REPO="gcr.io/knative-nightly"
 export GITHUB_TOKEN=""
 
 # Convenience function to run the hub tool.
@@ -104,7 +111,7 @@ function hub_tool() {
 # Shortcut to "git push" that handles authentication.
 # Parameters: $1..$n - arguments to "git push <repo>".
 function git_push() {
-  local repo_url="${KNATIVE_UPSTREAM}"
+  local repo_url="${REPO_UPSTREAM}"
   [[ -n "${GITHUB_TOKEN}}" ]] && repo_url="${repo_url/:\/\//:\/\/${GITHUB_TOKEN}@}"
   git push ${repo_url} $@
 }
@@ -140,15 +147,15 @@ function setup_upstream() {
   local upstream="$(git config --get remote.upstream.url)"
   echo "Remote upstream URL is '${upstream}'"
   if [[ -z "${upstream}" ]]; then
-    echo "Setting remote upstream URL to '${KNATIVE_UPSTREAM}'"
-    git remote add upstream ${KNATIVE_UPSTREAM}
+    echo "Setting remote upstream URL to '${REPO_UPSTREAM}'"
+    git remote add upstream ${REPO_UPSTREAM}
   fi
 }
 
 # Fetch the release branch, so we can check it out.
 function setup_branch() {
   [[ -z "${RELEASE_BRANCH}" ]] && return
-  git fetch ${KNATIVE_UPSTREAM} ${RELEASE_BRANCH}:upstream/${RELEASE_BRANCH}
+  git fetch ${REPO_UPSTREAM} ${RELEASE_BRANCH}:upstream/${RELEASE_BRANCH}
 }
 
 # Setup version, branch and release notes for a auto release.
@@ -157,30 +164,30 @@ function prepare_auto_release() {
   TAG_RELEASE=1
   PUBLISH_RELEASE=1
 
-  git fetch --all
+  git fetch --all || abort "error fetching branches/tags from remote"
   local tags="$(git tag | cut -d 'v' -f2 | cut -d '.' -f1-2 | sort | uniq)"
   local branches="$( { (git branch -r | grep upstream/release-) ; (git branch | grep release-); } | cut -d '-' -f2 | sort | uniq)"
-  RELEASE_VERSION=""
 
-  [[ -n "${tags}" ]] || abort "cannot obtain release tags for the repository"
-  [[ -n "${branches}" ]] || abort "cannot obtain release branches for the repository"
+  echo "Versions released (from tags): [" ${tags} "]"
+  echo "Versions released (from branches): [" ${branches} "]"
 
-  for i in $branches; do
-    RELEASE_NUMBER=$i
-    for j in $tags; do
-      if [[ "$i" == "$j" ]]; then
-        RELEASE_NUMBER=""
+  local release_number=""
+  for i in ${branches}; do
+    release_number="${i}"
+    for j in ${tags}; do
+      if [[ "${i}" == "${j}" ]]; then
+        release_number=""
       fi
     done
   done
 
-  if [ -z "$RELEASE_NUMBER" ]; then
+  if [[ -z "${release_number}" ]]; then
     echo "*** No new release will be generated, as no new branches exist"
     exit  0
   fi
 
-  RELEASE_VERSION="${RELEASE_NUMBER}.0"
-  RELEASE_BRANCH="release-${RELEASE_NUMBER}"
+  RELEASE_VERSION="${release_number}.0"
+  RELEASE_BRANCH="release-${release_number}"
   echo "Will create release ${RELEASE_VERSION} from branch ${RELEASE_BRANCH}"
   # If --release-notes not used, add a placeholder
   if [[ -z "${RELEASE_NOTES}" ]]; then
@@ -194,6 +201,7 @@ function prepare_dot_release() {
   echo "Dot release requested"
   TAG_RELEASE=1
   PUBLISH_RELEASE=1
+  git fetch --all || abort "error fetching branches/tags from remote"
   # List latest release
   local releases # don't combine with the line below, or $? will be 0
   releases="$(hub_tool release)"
@@ -206,21 +214,26 @@ function prepare_dot_release() {
   fi
   local last_version="$(echo "${releases}" | grep '^v[0-9]\+\.[0-9]\+\.[0-9]\+$' | sort -r | head -1)"
   [[ -n "${last_version}" ]] || abort "no previous release exist"
+  local major_minor_version=""
   if [[ -z "${RELEASE_BRANCH}" ]]; then
     echo "Last release is ${last_version}"
     # Determine branch
-    local major_minor_version="$(master_version ${last_version})"
+    major_minor_version="$(master_version ${last_version})"
     RELEASE_BRANCH="release-${major_minor_version}"
     echo "Last release branch is ${RELEASE_BRANCH}"
+  else
+    major_minor_version="${RELEASE_BRANCH##release-}"
   fi
+  [[ -n "${major_minor_version}" ]] || abort "cannot get release major/minor version"
   # Ensure there are new commits in the branch, otherwise we don't create a new release
   setup_branch
   local last_release_commit="$(git rev-list -n 1 ${last_version})"
   local release_branch_commit="$(git rev-list -n 1 upstream/${RELEASE_BRANCH})"
   [[ -n "${last_release_commit}" ]] || abort "cannot get last release commit"
   [[ -n "${release_branch_commit}" ]] || abort "cannot get release branch last commit"
+  echo "Version ${last_version} is at commit ${last_release_commit}"
+  echo "Branch ${RELEASE_BRANCH} is at commit ${release_branch_commit}"
   if [[ "${last_release_commit}" == "${release_branch_commit}" ]]; then
-    echo "*** Branch ${RELEASE_BRANCH} is at commit ${release_branch_commit}"
     echo "*** Branch ${RELEASE_BRANCH} has no new cherry-picks since release ${last_version}"
     echo "*** No dot release will be generated, as no changes exist"
     exit 0
@@ -319,15 +332,6 @@ function find_latest_nightly() {
 
 # Parses flags and sets environment variables accordingly.
 function parse_flags() {
-  TAG=""
-  RELEASE_VERSION=""
-  RELEASE_NOTES=""
-  RELEASE_BRANCH=""
-  KO_FLAGS="-P"
-  KO_DOCKER_REPO="gcr.io/knative-nightly"
-  RELEASE_GCS_BUCKET="knative-nightly/${REPO_NAME}"
-  GITHUB_TOKEN=""
-  FROM_NIGHTLY_RELEASE=""
   local has_gcr_flag=0
   local has_gcs_flag=0
   local is_dot_release=0
@@ -422,20 +426,21 @@ function parse_flags() {
     RELEASE_GCS_BUCKET=""
   fi
 
-  if (( TAG_RELEASE )); then
-    # Get the commit, excluding any tags but keeping the "dirty" flag
-    local commit="$(git describe --always --dirty --match '^$')"
-    [[ -n "${commit}" ]] || abort "error getting the current commit"
-    # Like kubernetes, image tag is vYYYYMMDD-commit
-    TAG="v$(date +%Y%m%d)-${commit}"
-  fi
+  # Get the commit, excluding any tags but keeping the "dirty" flag
+  BUILD_COMMIT_HASH="$(git describe --always --dirty --match '^$')"
+  [[ -n "${BUILD_COMMIT_HASH}" ]] || abort "error getting the current commit"
+  BUILD_YYYYMMDD="$(date -u +%Y%m%d)"
+  BUILD_TIMESTAMP="$(date -u '+%Y-%m-%d %H:%M:%S')"
+  BUILD_TAG="v${BUILD_YYYYMMDD}-${BUILD_COMMIT_HASH}"
 
-  if [[ -n "${RELEASE_VERSION}" ]]; then
-    TAG="v${RELEASE_VERSION}"
-  fi
-
+  (( TAG_RELEASE )) && TAG="${BUILD_TAG}"
+  [[ -n "${RELEASE_VERSION}" ]] && TAG="v${RELEASE_VERSION}"
   [[ -n "${RELEASE_VERSION}" && -n "${RELEASE_BRANCH}" ]] && (( PUBLISH_RELEASE )) && PUBLISH_TO_GITHUB=1
 
+  readonly BUILD_COMMIT_HASH
+  readonly BUILD_YYYYMMDD
+  readonly BUILD_TIMESTAMP
+  readonly BUILD_TAG
   readonly SKIP_TESTS
   readonly TAG_RELEASE
   readonly PUBLISH_RELEASE
@@ -513,13 +518,12 @@ function main() {
     git checkout upstream/${RELEASE_BRANCH} || abort "cannot checkout branch ${RELEASE_BRANCH}"
   fi
 
-  set -o errexit
-  set -o pipefail
-
   if [[ -n "${FROM_NIGHTLY_RELEASE}" ]]; then
     build_from_nightly_release
   else
+    set -e -o pipefail
     build_from_source
+    set +e +o pipefail
   fi
   # TODO(adrcunha): Remove once all repos use ARTIFACTS_TO_PUBLISH.
   [[ -z "${ARTIFACTS_TO_PUBLISH}" ]] && ARTIFACTS_TO_PUBLISH="${YAMLS_TO_PUBLISH}"
@@ -554,10 +558,17 @@ function publish_to_github() {
   git_push tag ${TAG}
 
   [[ -n "${RELEASE_BRANCH}" ]] && commitish="--commitish=${RELEASE_BRANCH}"
-  hub_tool release create \
-      --prerelease \
-      ${attachments[@]} \
-      --file=${description} \
-      ${commitish} \
-      ${TAG}
+  for i in {2..0}; do
+    hub_tool release create \
+        --prerelease \
+        ${attachments[@]} \
+        --file=${description} \
+        ${commitish} \
+        ${TAG} && return 0
+    if [[ "${i}" -gt 0 ]]; then
+      echo "Error publishing the release, retrying in 15s..."
+      sleep 15
+    fi
+  done
+  abort "Cannot publish release to GitHub"
 }
