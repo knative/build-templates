@@ -1,7 +1,7 @@
 # Knative Build Templates
 
 This repository contains a library of
-`BuildTemplate` [resources](https://github.com/knative/docs/blob/master/build/build-templates.md) which are designed to be reusable by many applications.
+`BuildTemplate` [resources](https://github.com/knative/docs/blob/master/docs/build/build-templates.md) which are designed to be reusable by many applications.
 
 Each build template is in a separate directory along with a README.md and a Kubernetes manifest, so you can choose which build templates to install on your cluster.
 
