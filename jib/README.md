@@ -113,26 +113,15 @@ Future builds should now run much faster.
 
 ## Usage (Gradle)
 
-This assumes the source repo is using the Gradle plugin, configured in
-`build.gradle`:
-
-```groovy
-plugins {
-  id 'com.google.cloud.tools.jib' version '0.9.10'
-}
-```
-
-See [setup instructions for
-Gradle](https://github.com/GoogleContainerTools/jib/tree/master/jib-gradle-plugin#setup).
-
 To use the `jib-gradle` template, first install the template:
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/master/jib/jib-gradle.yaml
 ```
 
-Then, define a build that instantiates the template:
+Then, define a `Build` that instantiates the template:
 
+`jib-gradle-build.yaml`:
 ```yaml
 apiVersion: build.knative.dev/v1alpha1
 kind: Build
@@ -149,3 +138,16 @@ spec:
     - name: IMAGE
       value: gcr.io/my-project/my-app
 ```
+
+Run the build:
+
+```shell
+kubectl apply -f jib-gradle-build.yaml
+```
+
+If you would like to customize the container, configure the `jib-gradle-plugin` in your `pom.xml`. 
+See [setup instructions for Gradle](https://github.com/GoogleContainerTools/jib/tree/master/jib-gradle-plugin#setup) for more information.
+
+### Speed up builds
+
+See [Speed up builds](#speed-up-builds).
