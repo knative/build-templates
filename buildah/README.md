@@ -8,6 +8,13 @@ This build template uses Buildah's support for building from
 `buildah bud` command. This command executes the directives in the `Dockerfile`
 to assemble a container image, then pushes that image to a container registry.
 
+
+## Create the template
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/master/buildah/buildah.yaml
+```
+
 ## Parameters
 
 * **BUILDER_IMAGE:**: The name of the image containing the Buildah tool. See
