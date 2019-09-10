@@ -12,7 +12,7 @@ makes it a perfect tool to be part of a Knative build.
 
 ## Create the registry configuration
 
-makisu uses a [registry configuration](https://github.com/uber/makisu/blob/master/docs/REGISTRY.md) which should be stored as a secret in Kubernetes. Adjust the `registry.yaml` in this diretroy to contain your user and password for the Docker hub (or configure a different [registry](https://github.com/uber/makisu/blob/master/docs/REGISTRY.md#examples)). Keep in mind that the secret must exist in the same namespace as the build runs.:
+makisu uses a [registry configuration](https://github.com/uber/makisu/blob/master/docs/REGISTRY.md) which should be stored as a secret in Kubernetes. Adjust the `registry.yaml` in this directory to contain your user and password for the Docker hub (or configure a different [registry](https://github.com/uber/makisu/blob/master/docs/REGISTRY.md#examples)). Keep in mind that the secret must exist in the same namespace as the build runs.:
 
 ```bash
 kubectl --namespace default create secret generic docker-registry-config --from-file=./registry.yaml
@@ -32,7 +32,7 @@ kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/maste
   `/workspace`)
 * **PUSH_REGISTRY**: The Registry to push the image to (_default:_
   `index.docker.io`)
-* **REGISTRY_SECRET**: Secret containing information about the used regsitry (_default:_
+* **REGISTRY_SECRET**: Secret containing information about the used registry (_default:_
   `docker-registry-config`)
 
 ## Usage
